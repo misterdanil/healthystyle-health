@@ -1,5 +1,7 @@
 package org.healthystyle.health.model;
 
+import java.util.Objects;
+
 import org.healthystyle.health.model.measure.Measure;
 import org.healthystyle.health.model.measure.convert.ConvertType;
 
@@ -37,6 +39,11 @@ public class IndicatorType {
 
 	public IndicatorType(String name, Measure measure, ConvertType convertType) {
 		super();
+		
+		Objects.requireNonNull(name, "Name must be not null");
+		Objects.requireNonNull(measure, "Measure must be not null");
+		Objects.requireNonNull(convertType, "Convert type must be not null");
+		
 		this.name = name;
 		this.measure = measure;
 		this.convertType = convertType;

@@ -11,4 +11,5 @@ public class Train {
 	private List<Set> sets;
 	@Temporal(TemporalType.TIME)
 	private Instant time;
+	private Integer day;
 }
