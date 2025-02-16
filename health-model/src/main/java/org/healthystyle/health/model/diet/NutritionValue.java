@@ -82,8 +82,4 @@ public class NutritionValue {
 		return createdOn;
 	}
 
-	public void setCreatedOn(Instant createdOn) {
-		this.createdOn = createdOn;
-	}
-
 }
