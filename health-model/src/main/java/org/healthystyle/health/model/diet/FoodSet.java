@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.healthystyle.health.model.Health;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +17,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -32,15 +35,19 @@ public class FoodSet {
 	private List<Food> foods;
 	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	private Instant createdOn;
+	@ManyToOne
+	@JoinColumn(name = "health_id", nullable = false)
+	private Health health;
 
 	public FoodSet() {
 		super();
 	}
 
-	public FoodSet(String title, Food... foods) {
+	public FoodSet(String title, Health health, Food... foods) {
 		super();
 
 		Objects.requireNonNull(title, "Title must be not null");
+		Objects.requireNonNull(health, "Health must be not null");
 		Objects.requireNonNull(foods, "Foods must be not null");
 		if (foods.length == 0) {
 			throw new IllegalArgumentException("Must be passed at least one food");
@@ -78,4 +85,7 @@ public class FoodSet {
 		return createdOn;
 	}
 
+	public Health getHealth() {
+		return health;
+	}
 }

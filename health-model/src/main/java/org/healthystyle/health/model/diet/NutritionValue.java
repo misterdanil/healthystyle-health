@@ -20,14 +20,14 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "nutrition_value", indexes = @Index(name = "nutrition_value_value_idx", columnList = "value"))
+@Table(name = "nutrition_value", indexes = @Index(name = "nutrition_value_value_idx", columnList = "value", unique = true))
 public class NutritionValue {
 	@Id
 	@SequenceGenerator(name = "nutrition_value_generator", sequenceName = "nutrition_value_sequence", initialValue = 1, allocationSize = 20)
 	@GeneratedValue(generator = "nutrition_value_generator", strategy = GenerationType.SEQUENCE)
 	private Long id;
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private Value value;
 	@ManyToOne
 	@JoinColumn(name = "measure_id", nullable = false)

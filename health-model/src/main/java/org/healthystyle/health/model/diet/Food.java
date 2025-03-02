@@ -29,7 +29,7 @@ public class Food {
 	@GeneratedValue(generator = "food_generator", strategy = GenerationType.SEQUENCE)
 	private Long id;
 	@Column(nullable = false, unique = true)
-	private String name;
+	private String title;
 	private String weight;
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "food")
 	private List<FoodValue> foodValues;
@@ -49,13 +49,13 @@ public class Food {
 		super();
 	}
 
-	public Food(String name, Health health) {
+	public Food(String title, Health health) {
 		super();
 
-		Objects.requireNonNull(name, "Name must be not null");
+		Objects.requireNonNull(title, "Title must be not null");
 		Objects.requireNonNull(health, "Health must be not null");
 
-		this.name = name;
+		this.title = title;
 		this.health = health;
 	}
 
@@ -63,12 +63,12 @@ public class Food {
 		return id;
 	}
 
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getWeight() {

@@ -3,6 +3,8 @@ package org.healthystyle.health.model.medicine;
 import java.time.Instant;
 import java.util.Objects;
 
+import org.healthystyle.health.model.Health;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,21 +42,26 @@ public class Plan {
 	@ManyToOne
 	@JoinColumn(name = "treatment_id", nullable = false)
 	private Treatment treatment;
+	@ManyToOne
+	@JoinColumn(name = "health_id", nullable = false)
+	private Health health;
 
 	public Plan() {
 		super();
 	}
 
-	public Plan(Medicine medicine, Instant start, Treatment treatment) {
+	public Plan(Medicine medicine, Instant start, Treatment treatment, Health health) {
 		super();
 
 		Objects.requireNonNull(medicine, "Medicine must be not null");
 		Objects.requireNonNull(start, "Start must be not null");
 		Objects.requireNonNull(treatment, "Treatment must be not null");
+		Objects.requireNonNull(health, "Health must be not null");
 
 		this.medicine = medicine;
 		this.start = start;
 		this.treatment = treatment;
+		this.health = health;
 	}
 
 	public Long getId() {
@@ -104,4 +111,9 @@ public class Plan {
 	public Treatment getTreatment() {
 		return treatment;
 	}
+
+	public Health getHealth() {
+		return health;
+	}
+
 }

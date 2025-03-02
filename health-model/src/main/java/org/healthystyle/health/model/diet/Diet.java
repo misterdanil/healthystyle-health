@@ -35,10 +35,10 @@ public class Diet {
 	private String title;
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "diet")
 	private List<Meal> meals;
-	@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.DATE)
 	@Column(nullable = false)
 	private Instant start;
-	@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.DATE)
 	@Column(nullable = false)
 	private Instant end;
 	@ManyToOne

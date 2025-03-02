@@ -13,5 +13,6 @@
 	</parent>
 	<modules>
 		<module>health-model</module>
+		<module>health-repository</module>
 	</modules>
 </project>

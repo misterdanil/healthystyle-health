@@ -1,5 +1,6 @@
 package org.healthystyle.health.model.sport;
 
+import java.time.Instant;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -27,6 +28,10 @@ public class Result {
 	private Integer setNumber;
 	@Column(name = "actual_repeat", nullable = false)
 	private Integer actualRepeat;
+	@Column(name = "executed_date", nullable = false)
+	private Instant date;
+	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	private Instant createdOn;
 
 	public Result() {
 		super();

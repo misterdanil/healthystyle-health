@@ -1,5 +1,6 @@
 package org.healthystyle.health.model.medicine;
 
+import java.time.Instant;
 import java.util.Objects;
 
 import org.healthystyle.health.model.Health;
@@ -36,6 +37,8 @@ public class Medicine {
 	@ManyToOne
 	@JoinColumn(name = "health_id", nullable = false)
 	private Health health;
+	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	private Instant createdOn;
 
 	public Medicine() {
 		super();

@@ -35,6 +35,7 @@ public class Train {
 	private Instant time;
 	@Column(nullable = false)
 	private Integer day;
+	private Sport sport;
 
 	public Train() {
 		super();
