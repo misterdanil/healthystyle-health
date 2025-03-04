@@ -69,4 +69,5 @@ public abstract class ConvertType {
 		this.createdOn = createdOn;
 	}
 
+	public abstract boolean support(String value);
 }

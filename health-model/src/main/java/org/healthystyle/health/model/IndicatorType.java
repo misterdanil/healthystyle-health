@@ -32,21 +32,25 @@ public class IndicatorType {
 	@ManyToOne
 	@JoinColumn(name = "convert_type_id", nullable = false)
 	private ConvertType convertType;
+	@Column(nullable = false)
+	private Long creator;
 
 	public IndicatorType() {
 		super();
 	}
 
-	public IndicatorType(String name, Measure measure, ConvertType convertType) {
+	public IndicatorType(String name, Measure measure, ConvertType convertType, Long creator) {
 		super();
-		
+
 		Objects.requireNonNull(name, "Name must be not null");
 		Objects.requireNonNull(measure, "Measure must be not null");
 		Objects.requireNonNull(convertType, "Convert type must be not null");
-		
+		Objects.requireNonNull(creator, "Creator must be not null");
+
 		this.name = name;
 		this.measure = measure;
 		this.convertType = convertType;
+		this.creator = creator;
 	}
 
 	public Long getId() {
@@ -77,4 +81,7 @@ public class IndicatorType {
 		this.convertType = convertType;
 	}
 
+	public Long getCreator() {
+		return creator;
+	}
 }

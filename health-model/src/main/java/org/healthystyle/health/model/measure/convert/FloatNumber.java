@@ -24,4 +24,22 @@ public class FloatNumber extends ConvertType {
 		this.range = range;
 	}
 
+	public Integer getRange() {
+		return range;
+	}
+
+	public void setRange(Integer range) {
+		this.range = range;
+	}
+
+	@Override
+	public boolean support(String value) {
+		try {
+			Float.parseFloat(value);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
 }

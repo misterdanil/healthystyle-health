@@ -27,21 +27,23 @@ public class Indicator {
 	@ManyToOne
 	@JoinColumn(name = "indicator_type_id", nullable = false)
 	private IndicatorType indicatorType;
-	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@Column(name = "created_on", nullable = false)
 	private Instant createdOn;
 	@ManyToOne
 	@JoinColumn(name = "health_id", nullable = false)
 	private Health health;
 
-	public Indicator(String value, IndicatorType indicatorType, Health health) {
+	public Indicator(String value, IndicatorType indicatorType, Instant createdOn, Health health) {
 		super();
 
 		Objects.requireNonNull(value, "Value must be not null");
 		Objects.requireNonNull(indicatorType, "Indicator type must be not null");
+		Objects.requireNonNull(createdOn, "Created on must be not null");
 		Objects.requireNonNull(health, "Health must be not null");
 
 		this.value = value;
 		this.indicatorType = indicatorType;
+		this.createdOn = createdOn;
 		this.health = health;
 	}
 
@@ -63,6 +65,10 @@ public class Indicator {
 
 	public Instant getCreatedOn() {
 		return createdOn;
+	}
+
+	public void setCreatedOn(Instant createdOn) {
+		this.createdOn = createdOn;
 	}
 
 	public Health getHealth() {
