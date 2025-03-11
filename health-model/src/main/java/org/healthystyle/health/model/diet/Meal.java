@@ -1,10 +1,12 @@
 package org.healthystyle.health.model.diet;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,13 +32,13 @@ public class Meal {
 	private Long id;
 	@ManyToMany
 	@JoinTable(name = "meal_food", joinColumns = @JoinColumn(name = "meal_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "food_id", nullable = false))
-	private List<Food> foods;
+	private Set<Food> foods;
 	@ManyToOne
 	@JoinColumn(name = "food_set_id", nullable = false)
 	private FoodSet foodSet;
 	@Temporal(TemporalType.TIME)
 	@Column(nullable = false)
-	private Instant time;
+	private LocalTime time;
 	@Column(nullable = false, columnDefinition = "SMALLINT CONSTRAINTS meal_day_check CHECK (day >= 0 AND day <= 6)")
 	private Integer day;
 	@ManyToOne
@@ -49,7 +51,7 @@ public class Meal {
 		super();
 	}
 
-	public Meal(Instant time, Integer day, Diet diet, Food... foods) {
+	public Meal(LocalTime time, Integer day, Diet diet, Food... foods) {
 		super();
 
 		Objects.requireNonNull(time, "Time must be not null");
@@ -60,29 +62,31 @@ public class Meal {
 			throw new IllegalArgumentException("Must be passed at least one food");
 		}
 
-		this.foods = new ArrayList<>(Arrays.asList(foods));
+		this.foods = new LinkedHashSet<>(Arrays.asList(foods));
 		this.time = time;
 		this.day = day;
 		this.diet = diet;
 	}
 
-	public Meal(FoodSet foodSet, Instant time, Integer day) {
+	public Meal(LocalTime time, Integer day, Diet diet, FoodSet foodSet) {
 		super();
 
-		Objects.requireNonNull(foodSet, "Food set must be not null");
 		Objects.requireNonNull(time, "Time must be not null");
 		Objects.requireNonNull(day, "Day must be not null");
+		Objects.requireNonNull(diet, "Diet must be not null");
+		Objects.requireNonNull(foodSet, "Food set must be not null");
 
-		this.foodSet = foodSet;
 		this.time = time;
 		this.day = day;
+		this.diet = diet;
+		this.foodSet = foodSet;
 	}
 
 	public Long getId() {
 		return id;
 	}
 
-	public List<Food> getFoods() {
+	public Set<Food> getFoods() {
 		return foods;
 	}
 
@@ -93,6 +97,14 @@ public class Meal {
 	public void addFood(Food food) {
 		getFoods().add(food);
 	}
+	
+	public void addFoods(List<Food> foods) {
+		getFoods().addAll(foods);
+	}
+	
+	public void clearFoods() {
+		getFoods().clear();
+	}
 
 	public FoodSet getFoodSet() {
 		return foodSet;
@@ -102,11 +114,11 @@ public class Meal {
 		this.foodSet = foodSet;
 	}
 
-	public Instant getTime() {
+	public LocalTime getTime() {
 		return time;
 	}
 
-	public void setTime(Instant time) {
+	public void setTime(LocalTime time) {
 		this.time = time;
 	}
 

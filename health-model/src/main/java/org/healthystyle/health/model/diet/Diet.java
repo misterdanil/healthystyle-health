@@ -51,20 +51,15 @@ public class Diet {
 		super();
 	}
 
-	public Diet(String title, Instant start, Instant end, Health health, Meal... meals) {
+	public Diet(String title, Instant start, Instant end, Health health) {
 		super();
 
 		Objects.requireNonNull(title, "Title must be not null");
 		Objects.requireNonNull(start, "Start must be not null");
 		Objects.requireNonNull(end, "End must be not null");
 		Objects.requireNonNull(health, "Health must be not null");
-		Objects.requireNonNull(meals, "Meals must be not null");
-		if (meals.length == 0) {
-			throw new IllegalArgumentException("Must be passed at least one meal");
-		}
 
 		this.title = title;
-		this.meals = new ArrayList<>(Arrays.asList(meals));
 		this.start = start;
 		this.end = end;
 		this.health = health;
