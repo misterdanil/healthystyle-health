@@ -44,7 +44,9 @@ public interface MealService {
 
 	boolean existsByDietAndDayAndTime(Long dietId, Integer day, LocalTime time);
 
-	void deleteById(Long id);
+	boolean existsById(Long mealId) throws ValidationException;
+
+	void deleteById(Long id) throws ValidationException;
 
 	void update(MealUpdateRequest updateRequest, Long mealId)
 			throws ValidationException, MealNotFoundException, NoFoodsException;

@@ -5,6 +5,7 @@ import static java.util.Map.entry;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -361,6 +362,22 @@ public class MealServiceImpl implements MealService {
 		LOG.debug("Got result by params {}: {}", params, result);
 
 		return result;
+	}
+
+	@Override
+	public boolean existsById(Long mealId) throws ValidationException {
+		LOG.debug("Checking meal id for not null");
+		if (mealId == null) {
+			BindingResult result = new MapBindingResult(new HashMap<>(), "meal");
+			result.reject("meal.exists.id.not_null");
+			throw new ValidationException("Exception occurred while checking for existing a meal by id. The id is null",
+					result);
+		}
+
+		boolean exists = repository.existsById(mealId);
+		LOG.info("Got exists result by id {}: {}", mealId, exists);
+
+		return exists;
 	}
 
 	@Override
