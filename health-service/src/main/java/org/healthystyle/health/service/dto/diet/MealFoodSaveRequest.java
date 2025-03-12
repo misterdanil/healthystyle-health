@@ -1,5 +1,7 @@
 package org.healthystyle.health.service.dto.diet;
 
+import java.util.Objects;
+
 import org.healthystyle.health.model.measure.Type;
 
 import jakarta.validation.constraints.NotNull;
@@ -46,6 +48,23 @@ public class MealFoodSaveRequest {
 
 	public void setMeasureType(Type measureType) {
 		this.measureType = measureType;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(foodId, mealId);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MealFoodSaveRequest other = (MealFoodSaveRequest) obj;
+		return Objects.equals(foodId, other.foodId) && Objects.equals(mealId, other.mealId);
 	}
 
 }

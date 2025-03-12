@@ -11,7 +11,7 @@ public class MethodNameHelper {
 	public static String[] getMethodParamNames(Class<?> clazz, String methodName, Class<?>... params) {
 		try {
 			return Arrays.stream(
-					MealFoodServiceImpl.class.getMethod("findByMeal", Long.class, int.class, int.class).getParameters())
+					clazz.getMethod(methodName, params).getParameters())
 					.map(p -> p.getName()).toArray(String[]::new);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new RuntimeException("Exception occurred while getting method param names", e);

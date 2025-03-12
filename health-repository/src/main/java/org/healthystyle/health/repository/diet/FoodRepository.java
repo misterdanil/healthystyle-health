@@ -6,11 +6,12 @@ import java.util.Set;
 import org.healthystyle.health.model.diet.Food;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FoodRepository {
+public interface FoodRepository extends JpaRepository<Food, Long> {
 	@Query("SELECT f FROM Food f INNER JOIN f.health h WHERE f.title LIKE '%:title%' AND h.id = :healthId ORDER BY f.createdOn")
 	Page<Food> findByTitle(String title, Long healthId, Pageable pageable);
 
@@ -19,4 +20,7 @@ public interface FoodRepository {
 
 	@Query(value = "SELECT f FROM food f LEFT JOIN meal_food mf ON mf.food_id = f.id AND mf.meal_id = ?1 WHERE f.id IN ?0 AND mf.meal_id IS NULL")
 	List<Food> findByIdsExcludeMeal(Set<Long> ids, Long mealId);
+
+	@Query("SELECT EXISTS (SELECT f FROM Food f INNER JOIN f.health h WHERE h.id = :healthId AND LOWER(f.title) = LOWER(:title))")
+	boolean existsByTitle(String title, Long healthId);
 }

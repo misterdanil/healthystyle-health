@@ -33,9 +33,6 @@ public class Meal {
 	@OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "meal_id", nullable = false)
 	private Set<MealFood> foods;
-	@ManyToOne
-	@JoinColumn(name = "food_set_id", nullable = false)
-	private FoodSet foodSet;
 	@Temporal(TemporalType.TIME)
 	@Column(nullable = false)
 	private LocalTime time;
@@ -51,18 +48,14 @@ public class Meal {
 		super();
 	}
 
-	public Meal(LocalTime time, Integer day, Diet diet, MealFood... foods) {
+	public Meal(LocalTime time, Integer day, Diet diet) {
 		super();
 
 		Objects.requireNonNull(time, "Time must be not null");
 		Objects.requireNonNull(day, "Day must be not null");
 		Objects.requireNonNull(diet, "Diet must be not null");
 		Objects.requireNonNull(foods, "Foods must be not null");
-		if (foods.length == 0) {
-			throw new IllegalArgumentException("Must be passed at least one food");
-		}
 
-		this.foods = new LinkedHashSet<>(Arrays.asList(foods));
 		this.time = time;
 		this.day = day;
 		this.diet = diet;
@@ -83,7 +76,6 @@ public class Meal {
 		this.time = time;
 		this.day = day;
 		this.diet = diet;
-		this.foodSet = foodSet;
 		this.foods = new LinkedHashSet<>(Arrays.asList(foods));
 	}
 
@@ -109,14 +101,6 @@ public class Meal {
 
 	public void clearFoods() {
 		getFoods().clear();
-	}
-
-	public FoodSet getFoodSet() {
-		return foodSet;
-	}
-
-	public void setFoodSet(FoodSet foodSet) {
-		this.foodSet = foodSet;
 	}
 
 	public LocalTime getTime() {

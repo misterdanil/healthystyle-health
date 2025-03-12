@@ -6,36 +6,41 @@ import java.util.Set;
 import jakarta.validation.constraints.NotNull;
 
 public class MealUpdateRequest {
-	private Set<Long> foodIds;
-	private Long foodSetId;
-	private Set<Long> removeFoodIds;
+	private Long id;
+	private Set<MealFoodSaveRequest> mealFoods;
+	private Set<MealFoodUpdateRequest> updateMealFoods;
+	private Set<Long> removeMealFoodIds;
 	@NotNull(message = "Укажите время приёма пищи")
 	private LocalTime time;
 	@NotNull(message = "Укажите день приёма пищи")
 	private Integer day;
 
-	public Set<Long> getFoodIds() {
-		return foodIds;
+	public Long getId() {
+		return id;
 	}
 
-	public void setFoodIds(Set<Long> foodIds) {
-		this.foodIds = foodIds;
+	public Set<MealFoodSaveRequest> getMealFoods() {
+		return mealFoods;
 	}
 
-	public Long getFoodSetId() {
-		return foodSetId;
+	public void setMealFoods(Set<MealFoodSaveRequest> mealFoods) {
+		this.mealFoods = mealFoods;
 	}
 
-	public void setFoodSetId(Long foodSetId) {
-		this.foodSetId = foodSetId;
+	public Set<MealFoodUpdateRequest> getUpdateMealFoods() {
+		return updateMealFoods;
 	}
 
-	public Set<Long> getRemoveFoodIds() {
-		return removeFoodIds;
+	public void setUpdateMealFoods(Set<MealFoodUpdateRequest> updateMealFoods) {
+		this.updateMealFoods = updateMealFoods;
 	}
 
-	public void setRemoveFoodIds(Set<Long> removeFoodIds) {
-		this.removeFoodIds = removeFoodIds;
+	public Set<Long> getRemoveMealFoodIds() {
+		return removeMealFoodIds;
+	}
+
+	public void setRemoveMealFoodIds(Set<Long> removeMealFoodIds) {
+		this.removeMealFoodIds = removeMealFoodIds;
 	}
 
 	public LocalTime getTime() {

@@ -4,7 +4,6 @@ import static java.util.Map.entry;
 
 import java.time.Instant;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,21 +15,30 @@ import org.healthystyle.health.model.diet.Diet;
 import org.healthystyle.health.model.diet.Food;
 import org.healthystyle.health.model.diet.FoodSet;
 import org.healthystyle.health.model.diet.Meal;
+import org.healthystyle.health.model.diet.MealFood;
 import org.healthystyle.health.repository.diet.MealRepository;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.diet.DietService;
 import org.healthystyle.health.service.diet.FoodService;
 import org.healthystyle.health.service.diet.FoodSetService;
+import org.healthystyle.health.service.diet.MealFoodService;
+import org.healthystyle.health.service.diet.MealFoodService.MealFoodNotFoundException;
 import org.healthystyle.health.service.diet.MealService;
+import org.healthystyle.health.service.dto.diet.MealFoodSaveRequest;
+import org.healthystyle.health.service.dto.diet.MealFoodUpdateRequest;
+import org.healthystyle.health.service.dto.diet.MealReplaceRequest;
 import org.healthystyle.health.service.dto.diet.MealSaveRequest;
 import org.healthystyle.health.service.dto.diet.MealUpdateRequest;
 import org.healthystyle.health.service.error.ValidationException;
+import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
 import org.healthystyle.health.service.error.diet.DietNotFoundException;
 import org.healthystyle.health.service.error.diet.FoodNotFoundException;
 import org.healthystyle.health.service.error.diet.FoodSetNotFoundException;
 import org.healthystyle.health.service.error.diet.MealExistsException;
+import org.healthystyle.health.service.error.diet.MealFoodExistException;
 import org.healthystyle.health.service.error.diet.MealNotFoundException;
 import org.healthystyle.health.service.error.diet.NoFoodsException;
+import org.healthystyle.health.service.error.measure.MeasureNotFoundException;
 import org.healthystyle.health.service.log.LogTemplate;
 import org.healthystyle.health.service.validation.ParamsChecker;
 import org.slf4j.Logger;
@@ -58,6 +66,8 @@ public class MealServiceImpl implements MealService {
 	private FoodService foodService;
 	@Autowired
 	private FoodSetService foodSetService;
+	@Autowired
+	private MealFoodService mealFoodService;
 
 	private static final Integer MAX_SIZE = 25;
 
@@ -115,34 +125,6 @@ public class MealServiceImpl implements MealService {
 		Long healthId = healthAccessor.getHealth().getId();
 
 		Page<Meal> meals = repository.findByFoods(foodIds, healthId, PageRequest.of(page, limit));
-		LOG.info("Got meals by params {} successfully", params);
-
-		return meals;
-	}
-
-	@Override
-	public Page<Meal> findByFoodSet(Long foodSetId, int page, int limit) throws ValidationException {
-		String params = LogTemplate.getParamsTemplate(
-				Map.ofEntries(entry("foodSetId", foodSetId), entry("page", page), entry("limit", limit)));
-
-		LOG.debug("Validating params: {}", params);
-		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "meal");
-		if (foodSetId == null) {
-			result.reject("meal.find.food_set.notNull", "Укажите набор блюд для поиска");
-		}
-
-		ParamsChecker.checkPageNumber(page, result);
-		ParamsChecker.checkLimit(limit, MAX_SIZE, result);
-
-		if (result.hasErrors()) {
-			throw new ValidationException(
-					"Exception occurred while fetching meal by food set. The params are invalid. The params: %s. Result: %s",
-					result, params, result);
-		}
-
-		Long healthId = healthAccessor.getHealth().getId();
-
-		Page<Meal> meals = repository.findByFoodSet(foodSetId, healthId, PageRequest.of(page, limit));
 		LOG.info("Got meals by params {} successfully", params);
 
 		return meals;
@@ -281,8 +263,9 @@ public class MealServiceImpl implements MealService {
 	}
 
 	@Override
-	public Meal save(MealSaveRequest saveRequest, Long dietId) throws ValidationException, MealExistsException,
-			DietNotFoundException, FoodNotFoundException, FoodSetNotFoundException {
+	public Meal save(MealSaveRequest saveRequest, Long dietId)
+			throws ValidationException, MealExistsException, DietNotFoundException, FoodNotFoundException,
+			MealNotFoundException, MealFoodExistException, MeasureNotFoundException, ConvertTypeNotRecognizedException {
 		LOG.debug("Validating a meal: {}", saveRequest);
 		BindingResult result = new BeanPropertyBindingResult(saveRequest, "meal");
 		validator.validate(saveRequest, result);
@@ -310,38 +293,11 @@ public class MealServiceImpl implements MealService {
 		}
 		LOG.debug("The meal by diet id {}, day {} and time {} was not found");
 
-		Meal meal;
-		List<Long> foodIds = saveRequest.getFoodIds();
-		Food[] foods = new Food[foodIds.size()];
-		FoodSet foodSet = null;
-		if (foodIds != null && !foodIds.isEmpty()) {
-			LOG.debug("Checking foods for existence: {}. Meal: {}", foodIds, saveRequest);
-			List<Long> notFoundIds = new ArrayList<>();
-			for (int i = 0; i < foodIds.size(); i++) {
-				Long foodId = foodIds.get(i);
-				LOG.debug("Checking food for existence: {}. Meal: {}", foodId, saveRequest);
-				try {
-					Food food = foodService.findById(foodId);
-					foods[i] = food;
-				} catch (FoodNotFoundException e) {
-					notFoundIds.add(foodId);
-				}
-			}
-
-			if (notFoundIds.size() > 0) {
-				throw new FoodNotFoundException(result, notFoundIds.toArray(new Long[notFoundIds.size()]));
-			}
-
-			LOG.debug("All foods was found. Meal: {}", saveRequest);
-			meal = new Meal(time, day, diet, foods);
-		} else {
-			Long foodSetId = saveRequest.getFoodSetId();
-
-			LOG.debug("Checking food set for existence: {}. Meal: {}", foodSetId, saveRequest);
-			foodSet = foodSetService.findById(foodSetId);
-			LOG.debug("Food set was found. Meal: {}", saveRequest);
-
-			meal = new Meal(time, day, diet, foodSet);
+		Meal meal = new Meal(time, day, diet);
+		List<MealFoodSaveRequest> mealFoods = saveRequest.getMealFoods();
+		LOG.debug("Saving meal foods. The meal: {}", saveRequest);
+		for (MealFoodSaveRequest mealFood : mealFoods) {
+			mealFoodService.save(mealFood);
 		}
 
 		LOG.debug("The meal '{}' is valid. Saving: {}", saveRequest, meal);
@@ -381,8 +337,9 @@ public class MealServiceImpl implements MealService {
 	}
 
 	@Override
-	public void update(MealUpdateRequest updateRequest, Long mealId)
-			throws ValidationException, MealNotFoundException, NoFoodsException {
+	public void update(MealUpdateRequest updateRequest, Long mealId) throws ValidationException, MealNotFoundException,
+			NoFoodsException, FoodNotFoundException, MealFoodExistException, MeasureNotFoundException,
+			ConvertTypeNotRecognizedException, MealFoodNotFoundException, MealExistsException {
 		LOG.debug("Validating a meal {}: {}", mealId, updateRequest);
 		BindingResult result = new BeanPropertyBindingResult(updateRequest, "meal");
 		if (mealId == null) {
@@ -391,51 +348,30 @@ public class MealServiceImpl implements MealService {
 					updateRequest);
 		}
 
-		Set<Long> foodIds = updateRequest.getFoodIds();
-		Long foodSetId = updateRequest.getFoodSetId();
-		if ((foodIds != null && foodIds.size() > 0) && foodSetId != null
-				|| ((foodIds == null) || foodIds.isEmpty()) && foodSetId == null) {
-			result.reject("meal.update.food_and_set.not_null",
-					"Укажите либо еду, либо набор еды, но не то и не другое вместе");
-			throw new ValidationException(
-					"Exception occurred while updating a meal '%s'. Foods '%s' and food set id '%s' are pointed both",
-					result, mealId, foodIds, foodSetId);
-		}
+		Meal meal = findById(mealId);
 
-		Meal meal = repository.findById(mealId).get();
-		if (meal == null) {
-			result.reject("meal.update.not_exist", "Блюда с данным идентификатором не существует");
-			throw new MealNotFoundException(mealId, result);
-		}
-
-		Set<Long> removeFoodIds = updateRequest.getRemoveFoodIds();
-		if (removeFoodIds != null) {
-			LOG.debug("Deleting foods '{}' from meal '{}'", removeFoodIds, mealId);
-			repository.deleteFoodsById(mealId, removeFoodIds);
-			LOG.info("Deleted all foods '{}' from meal '{}'", removeFoodIds, mealId);
-		}
-
-		if (foodIds != null && !foodIds.isEmpty()) {
-			LOG.debug("Getting foods by ids {} for meal '{}'", foodIds, mealId);
-			List<Food> foods = foodService.findByIdsExcludeMeal(foodIds, mealId);
-			if (foods.isEmpty()) {
-				result.reject("meal.update.food_ids.not_found",
-						"По данным идентификаторам блюд не удалось найти ни одной еды");
-				throw new FoodNotFoundException(result, foodIds.toArray(new Long[foodIds.size()]));
+		Set<MealFoodSaveRequest> mealFoods = updateRequest.getMealFoods();
+		if (mealFoods != null && !mealFoods.isEmpty()) {
+			LOG.debug("Saving meal foods '{}' for meal '{}'", mealFoods, mealId);
+			for (MealFoodSaveRequest mealFood : mealFoods) {
+				LOG.debug("Saving meal food '{}' for meal '{}'", mealFood, mealId);
+				mealFoodService.save(mealFood);
 			}
-			meal.setFoodSet(null);
-			repository.addFoods(foods, mealId);
-			if (repository.countFoods(mealId) == 0) {
-				result.reject("meal.update.no_foods", "Укажите хотя бы одну еду");
-				throw new NoFoodsException(mealId, result);
+		}
+
+		Set<MealFoodUpdateRequest> updateMealFoods = updateRequest.getUpdateMealFoods();
+		if (updateMealFoods != null && !updateMealFoods.isEmpty()) {
+			LOG.debug("Updating meal foods '{}' for meal '{}'", updateMealFoods, mealId);
+			for (MealFoodUpdateRequest mealFood : updateMealFoods) {
+				LOG.debug("Updating meal food '{}' for meal '{}'", mealFood, mealId);
+				mealFoodService.update(mealFood, mealId);
 			}
-			LOG.info("Added new foods {} to meal: {}", foods, mealId);
-		} else if (foodSetId != null) {
-			LOG.debug("Getting food set for meal: {}", mealId);
-			FoodSet foodSet = foodSetService.findById(foodSetId);
-			meal.clearFoods();
-			meal.setFoodSet(foodSet);
-			LOG.info("Set food set to '{}' for meal '{}'", foodSet, mealId);
+		}
+
+		Set<Long> removeMealFoodIds = updateRequest.getRemoveMealFoodIds();
+		if (removeMealFoodIds != null && !removeMealFoodIds.isEmpty()) {
+			LOG.debug("Deleting meal foods '{}' from meal '{}'", removeMealFoodIds, mealId);
+			mealFoodService.deleteByIds(removeMealFoodIds, meal.getId());
 		}
 
 		Long dietId = meal.getDiet().getId();
@@ -457,4 +393,48 @@ public class MealServiceImpl implements MealService {
 		repository.save(meal);
 		LOG.info("The meal '{}' has been updated successfully: {}", mealId, updateRequest);
 	}
+
+	@Override
+	public Meal replace(MealReplaceRequest replaceRequest) throws ValidationException, MealExistsException,
+			DietNotFoundException, FoodNotFoundException, FoodSetNotFoundException, MealNotFoundException,
+			MealFoodExistException, MeasureNotFoundException, ConvertTypeNotRecognizedException {
+		LOG.debug("Validating the meal: {}", replaceRequest);
+		BindingResult result = new BeanPropertyBindingResult(replaceRequest, "meal");
+		validator.validate(replaceRequest, result);
+		if (result.hasErrors()) {
+			throw new ValidationException(
+					"Exception occurred while replacing a meal. The data is invalid: %s. Result: %s", result,
+					replaceRequest, result);
+		}
+
+		Long mealId = replaceRequest.getMealId();
+		LOG.debug("Checking meal id '{}' for existence", mealId);
+		Meal replacedMeal = findById(mealId);
+
+		LOG.debug("The data is valid: {}", replaceRequest);
+
+		LOG.debug("Deleting replaced meal: {}", replacedMeal);
+		repository.delete(replacedMeal);
+
+		MealSaveRequest newMeal = new MealSaveRequest(replaceRequest.getMealFoods(), replacedMeal.getTime(),
+				replacedMeal.getDay());
+		Meal meal = save(newMeal, replacedMeal.getDiet().getId());
+		LOG.info("The meal was replaced successfully from '{}' to '{}'", replacedMeal, meal);
+
+		return meal;
+	}
+
+	@Override
+	public void deleteByIds(Set<Long> ids) throws ValidationException {
+		LOG.debug("Checking meal id for not null");
+		if (ids == null) {
+			BindingResult result = new MapBindingResult(new HashMap<>(), "meal");
+			result.reject("meal.delete.ids.not_null");
+			throw new ValidationException("Exception occurred while deleting meals by ids. The ids is null", result);
+		}
+
+		repository.deleteByIds(ids);
+		LOG.info("Meals was deleted successfully by ids '{}'", ids);
+	}
+
 }

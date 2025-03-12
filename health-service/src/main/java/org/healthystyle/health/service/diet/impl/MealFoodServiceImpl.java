@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.healthystyle.health.model.diet.Food;
 import org.healthystyle.health.model.diet.Meal;
@@ -23,7 +24,9 @@ import org.healthystyle.health.service.dto.diet.MealFoodUpdateRequest;
 import org.healthystyle.health.service.error.ValidationException;
 import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
 import org.healthystyle.health.service.error.diet.FoodNotFoundException;
+import org.healthystyle.health.service.error.diet.MealFoodExistException;
 import org.healthystyle.health.service.error.diet.MealNotFoundException;
+import org.healthystyle.health.service.error.diet.NoFoodsException;
 import org.healthystyle.health.service.error.measure.MeasureNotFoundException;
 import org.healthystyle.health.service.error.measure.convert.ConvertTypeNotFoundException;
 import org.healthystyle.health.service.helper.MethodNameHelper;
@@ -114,7 +117,7 @@ public class MealFoodServiceImpl implements MealFoodService {
 
 	@Override
 	public MealFood save(MealFoodSaveRequest saveRequest) throws ValidationException, MealNotFoundException,
-			FoodNotFoundException, MeasureNotFoundException, ConvertTypeNotRecognizedException {
+			MealFoodExistException, FoodNotFoundException, MeasureNotFoundException, ConvertTypeNotRecognizedException {
 		LOG.debug("Validating params: {}", saveRequest);
 		BindingResult result = new BeanPropertyBindingResult(saveRequest, "mealFood");
 		validator.validate(saveRequest, result);
@@ -130,6 +133,11 @@ public class MealFoodServiceImpl implements MealFoodService {
 		Long foodId = saveRequest.getFoodId();
 		LOG.debug("Checking food id '{}' for existing", foodId);
 		Food food = foodService.findById(foodId);
+
+		if (repository.existsByMealAndFood(mealId, foodId)) {
+			result.reject("meal_food.save.exists", "Еда уже была добавлена в данный приём пищи");
+			throw new MealFoodExistException(mealId, foodId, result);
+		}
 
 		Type measureType = saveRequest.getMeasureType();
 		LOG.debug("Checking measure type '{}' for existing", measureType);
@@ -197,6 +205,29 @@ public class MealFoodServiceImpl implements MealFoodService {
 
 		repository.delete(mealFood);
 		LOG.info("A meal food '{}' was deleted successfully", mealFood);
+	}
+
+	@Override
+	public void deleteByIds(Set<Long> ids, Long mealId) throws ValidationException, NoFoodsException {
+		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "mealFood");
+
+		LOG.debug("Checking ids '{}' for emptiness");
+		if (ids == null || ids.isEmpty()) {
+			result.reject("meal_food.delete.ids.not_empty", "Укажите хотя один идентификатор для удаления");
+			throw new ValidationException(
+					"Exception occurred while deleting meal foods by ids. The ids is null or empty", result);
+		}
+
+		LOG.debug("Deleting meal foods by ids: {}", ids);
+		repository.deleteByIds(ids);
+
+		LOG.debug("Checking count foods for not 0");
+		if (repository.countFoods(mealId) == 0) {
+			result.reject("meal.update.no_foods", "В приёме пищи не осталось ни одной еды. Добавьте хотя бы одну");
+			throw new NoFoodsException(mealId, result);
+		}
+
+		LOG.info("Meal foods was deleted successfully by ids '{}'", ids);
 	}
 
 }

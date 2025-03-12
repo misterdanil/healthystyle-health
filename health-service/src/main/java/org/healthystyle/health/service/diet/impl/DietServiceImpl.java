@@ -20,15 +20,22 @@ import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.diet.DietService;
 import org.healthystyle.health.service.diet.MealService;
 import org.healthystyle.health.service.dto.diet.DietSaveRequest;
+import org.healthystyle.health.service.dto.diet.DietUpdateRequest;
 import org.healthystyle.health.service.dto.diet.MealSaveRequest;
+import org.healthystyle.health.service.dto.diet.MealUpdateRequest;
 import org.healthystyle.health.service.error.ValidationException;
+import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
 import org.healthystyle.health.service.error.diet.DietExistException;
 import org.healthystyle.health.service.error.diet.DietNotFoundException;
 import org.healthystyle.health.service.error.diet.FoodNotFoundException;
 import org.healthystyle.health.service.error.diet.FoodSetNotFoundException;
 import org.healthystyle.health.service.error.diet.MealExistsException;
+import org.healthystyle.health.service.error.diet.MealFoodExistException;
 import org.healthystyle.health.service.error.diet.MealFoodNotFoundException;
+import org.healthystyle.health.service.error.diet.MealNotFoundException;
+import org.healthystyle.health.service.error.diet.MealSaveException;
 import org.healthystyle.health.service.error.diet.MealTimeDuplicateException;
+import org.healthystyle.health.service.error.measure.MeasureNotFoundException;
 import org.healthystyle.health.service.log.LogTemplate;
 import org.healthystyle.health.service.validation.ParamsChecker;
 import org.slf4j.Logger;
@@ -58,6 +65,25 @@ public class DietServiceImpl implements DietService {
 	private static final Integer MAX_SIZE = 25;
 
 	private static final Logger LOG = LoggerFactory.getLogger(DietServiceImpl.class);
+
+	public Diet findById(Long id) throws ValidationException, DietNotFoundException {
+		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "diet");
+
+		LOG.debug("Checking id for not null");
+		if (id == null) {
+			result.reject("diet.find.id.not_null", "Укажите идентификатор диеты для поиска");
+			throw new ValidationException("Exception occurred while fetching a diet by id. The id is null", result);
+		}
+
+		Optional<Diet> diet = repository.findById(id);
+		if (diet.isEmpty()) {
+			result.reject("diet.find.not_found", "Не удалось найти диету по заданному идентификатору");
+			throw new DietNotFoundException(id, result);
+		}
+		LOG.info("Got diet by id '{}' successfully", id);
+
+		return diet.get();
+	}
 
 	@Override
 	public Page<Diet> findByTitle(String title, int page, int limit) throws ValidationException {
@@ -120,7 +146,7 @@ public class DietServiceImpl implements DietService {
 	}
 
 	@Override
-	public Page<Diet> findActual(int page, int limit) {
+	public Page<Diet> findActual(int page, int limit) throws ValidationException {
 		String paramsTemplate = LogTemplate
 				.getParamsTemplate(Map.ofEntries(entry("page", page), entry("limit", limit)));
 		LOG.debug("Validating params: {}", paramsTemplate);
@@ -179,7 +205,7 @@ public class DietServiceImpl implements DietService {
 	@Override
 	@Transactional
 	public Diet save(DietSaveRequest saveRequest)
-			throws ValidationException, DietExistException, MealTimeDuplicateException, MealFoodNotFoundException {
+			throws ValidationException, DietExistException, MealTimeDuplicateException, MealSaveException {
 		LOG.debug("Validating a diet: {}", saveRequest);
 		BindingResult result = new BeanPropertyBindingResult(saveRequest, "diet");
 		validator.validate(saveRequest, result);
@@ -220,17 +246,17 @@ public class DietServiceImpl implements DietService {
 		diet = repository.save(diet);
 
 		LOG.debug("Saving meals: {}. The diet: {}", meals, saveRequest);
-		Map<MealSaveRequest, List<Long>> mealFoodIds = new HashMap<>();
-		Map<MealSaveRequest, Long> mealFoodSetId = new HashMap<>();
 		for (MealSaveRequest mealSaveRequest : meals) {
 			try {
-				Meal meal = mealService.save(mealSaveRequest, diet.getId());
-				LOG.debug("Meal '{}' was saved successfully. Adding to diet: {}", meal, diet.getId());
-				diet.addMeal(meal);
-			} catch (FoodNotFoundException e) {
-				mealFoodIds.put(mealSaveRequest, Arrays.asList(e.getIds()));
-			} catch (FoodSetNotFoundException e) {
-				mealFoodSetId.put(mealSaveRequest, e.getId());
+				Meal meal;
+				try {
+					meal = mealService.save(mealSaveRequest, diet.getId());
+					LOG.debug("Meal '{}' was saved successfully. Adding to diet: {}", meal, diet.getId());
+					diet.addMeal(meal);
+				} catch (ValidationException | FoodNotFoundException | MealNotFoundException | MealFoodExistException
+						| MeasureNotFoundException | ConvertTypeNotRecognizedException e) {
+					throw new MealSaveException(mealSaveRequest, diet.getId(), e);
+				}
 			} catch (MealExistsException e) {
 				throw new RuntimeException(
 						"Exception occurred while saving a diet. Meal exists but diet is not stil saved", e);
@@ -241,12 +267,50 @@ public class DietServiceImpl implements DietService {
 			}
 		}
 
-		LOG.debug("Checking meals for food existence: {}. The diet: {}", meals, diet.getId());
-		if (!mealFoodIds.isEmpty() || !mealFoodSetId.isEmpty()) {
-			throw new MealFoodNotFoundException(result, mealFoodIds, mealFoodSetId);
+		return diet;
+	}
+
+	@Override
+	public void update(DietUpdateRequest updateRequest, Long dietId)
+			throws ValidationException, DietNotFoundException, DietExistException {
+		LOG.debug("Validating data: {}", updateRequest);
+		BindingResult result = new BeanPropertyBindingResult(updateRequest, "diet");
+		validator.validate(updateRequest, result);
+		if (result.hasErrors()) {
+			throw new ValidationException(
+					"Exception occurred while updating a diet '%s'. The data is invalid: %s. Result: %s", result,
+					dietId, updateRequest, result);
 		}
 
-		return diet;
+		LOG.debug("Getting health for update diet: {}", updateRequest);
+		Health health = healthAccessor.getHealth();
+
+		LOG.debug("Checking diet for existence by id '{}'", dietId);
+		Diet diet = findById(dietId);
+
+		String title = updateRequest.getTitle();
+		if (!title.equals(diet.getTitle())) {
+			LOG.debug("Checking diet for existence by title: ", updateRequest);
+			if (repository.existsByTitle(title, health.getId())) {
+				result.reject("diet.update.title.exists", "Диета с данным названием уже существует");
+				throw new DietExistException(title, result);
+			}
+		}
+
+		Instant start = updateRequest.getStart();
+		if (!start.equals(diet.getStart())) {
+			diet.setStart(start);
+		}
+
+		Instant end = updateRequest.getEnd();
+		if (!end.equals(diet.getEnd())) {
+			diet.setEnd(end);
+		}
+
+		LOG.debug("The data is valid: {}", updateRequest);
+
+		repository.save(diet);
+		LOG.info("The diet was update successfully: '{}'", diet);
 	}
 
 	@Override

@@ -21,9 +21,6 @@ public interface MealRepository extends JpaRepository<Meal, Long>, CustomMealRep
 	@Query("SELECT m FROM Meal m INNER JOIN m.foods f WHERE f.id IN :foodIds")
 	Page<Meal> findByFoods(List<Long> foodIds, Long healthId, Pageable pageable);
 
-	@Query("SELECT m FROM Meal m INNER JOIN m.foodSet fs WHERE fs.id = :foodSetId")
-	Page<Meal> findByFoodSet(Long foodSetId, Long healthId, Pageable pageable);
-
 	@Query("SELECT m FROM Meal m INNER JOIN m.diet d INNER JOIN d.health h WHERE CAST(:date AS date) BETWEEN d.start AND d.end AND m.day = extract(dow FROM :date) AND h.id = :healthId ORDER BY m.day, m.time")
 	Page<Meal> findByDate(Instant date, Long healthId, Pageable pageable);
 
@@ -48,6 +45,6 @@ public interface MealRepository extends JpaRepository<Meal, Long>, CustomMealRep
 	@Query(value = "DELETE FROM meal m INNER JOIN meal_food mf ON mf.meal_id = m.id WHERE m.id = ?0 AND f.food_id IN ?1", nativeQuery = true)
 	void deleteFoodsById(Long mealId, Set<Long> foodIds);
 
-	@Query("SELECT COUNT(mf) FROM meal_food mf WHERE mf.meal_id = :mealId")
-	Integer countFoods(Long mealId);
+	@Query("DELETE FROM Meal m WHERE m.id IN :ids")
+	void deleteByIds(Set<Long> ids);
 }

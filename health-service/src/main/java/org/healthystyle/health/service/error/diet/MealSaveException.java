@@ -1,30 +1,23 @@
 package org.healthystyle.health.service.error.diet;
 
-public class MealSaveException extends Exception {
+import org.healthystyle.health.service.dto.diet.MealSaveRequest;
+import org.healthystyle.health.service.error.AbstractException;
 
-	public MealSaveException() {
-		super();
-		// TODO Auto-generated constructor stub
+public class MealSaveException extends AbstractException {
+	private Long dietId;
+	private MealSaveRequest saveRequest;
+
+	public MealSaveException(MealSaveRequest saveRequest, Long dietId, AbstractException cause) {
+		super(cause.getResult(), "Could not save meal '%s' for diet '%s'", saveRequest, dietId);
+		this.dietId = dietId;
+		this.saveRequest = saveRequest;
 	}
 
-	public MealSaveException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
+	public Long getDietId() {
+		return dietId;
 	}
 
-	public MealSaveException(String message, Throwable cause) {
-		super(message, cause);
-		// TODO Auto-generated constructor stub
+	public MealSaveRequest getSaveRequest() {
+		return saveRequest;
 	}
-
-	public MealSaveException(String message) {
-		super(message);
-		// TODO Auto-generated constructor stub
-	}
-
-	public MealSaveException(Throwable cause) {
-		super(cause);
-		// TODO Auto-generated constructor stub
-	}
-
 }

@@ -8,24 +8,26 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.healthystyle.health.model.diet.Meal;
+import org.healthystyle.health.service.diet.MealFoodService.MealFoodNotFoundException;
 import org.healthystyle.health.service.dto.diet.MealReplaceRequest;
 import org.healthystyle.health.service.dto.diet.MealSaveRequest;
 import org.healthystyle.health.service.dto.diet.MealUpdateRequest;
 import org.healthystyle.health.service.error.ValidationException;
+import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
 import org.healthystyle.health.service.error.diet.DietNotFoundException;
 import org.healthystyle.health.service.error.diet.FoodNotFoundException;
 import org.healthystyle.health.service.error.diet.FoodSetNotFoundException;
 import org.healthystyle.health.service.error.diet.MealExistsException;
+import org.healthystyle.health.service.error.diet.MealFoodExistException;
 import org.healthystyle.health.service.error.diet.MealNotFoundException;
 import org.healthystyle.health.service.error.diet.NoFoodsException;
+import org.healthystyle.health.service.error.measure.MeasureNotFoundException;
 import org.springframework.data.domain.Page;
 
 public interface MealService {
 	Meal findById(Long id) throws MealNotFoundException;
 
 	Page<Meal> findByFoods(List<Long> foodIds, int page, int limit) throws ValidationException;
-
-	Page<Meal> findByFoodSet(Long foodSetId, int page, int limit) throws ValidationException;
 
 	Page<Meal> findByDate(Instant date, int page, int limit) throws ValidationException;
 
@@ -38,18 +40,22 @@ public interface MealService {
 	Page<Meal> findByDiet(Long dietId, int page, int limit) throws ValidationException;
 
 	Meal save(MealSaveRequest saveRequest, Long dietId) throws ValidationException, MealExistsException,
-			DietNotFoundException, FoodNotFoundException, FoodSetNotFoundException;
+			DietNotFoundException, FoodNotFoundException, MealNotFoundException,
+			MealFoodExistException, MeasureNotFoundException, ConvertTypeNotRecognizedException;
 
-	Meal replace(MealReplaceRequest replaceRequest);
+	Meal replace(MealReplaceRequest replaceRequest) throws ValidationException, MealExistsException,
+			DietNotFoundException, FoodNotFoundException, FoodSetNotFoundException, MealNotFoundException,
+			MealFoodExistException, MeasureNotFoundException, ConvertTypeNotRecognizedException;
 
 	boolean existsByDietAndDayAndTime(Long dietId, Integer day, LocalTime time);
 
 	boolean existsById(Long mealId) throws ValidationException;
 
-	void deleteById(Long id) throws ValidationException;
+	void deleteByIds(Set<Long> ids) throws ValidationException;
 
-	void update(MealUpdateRequest updateRequest, Long mealId)
-			throws ValidationException, MealNotFoundException, NoFoodsException;
+	void update(MealUpdateRequest updateRequest, Long mealId) throws ValidationException, MealNotFoundException,
+			NoFoodsException, FoodNotFoundException, MealFoodExistException, MeasureNotFoundException,
+			ConvertTypeNotRecognizedException, MealFoodNotFoundException, MealExistsException;
 
 	public static void main(String[] args) {
 		Test t = new Test();

@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 public abstract class AbstractException extends Exception {
+	private BindingResult result;
 	private List<String> globalErrors;
 	private Map<String, String> fieldErrors;
 	private String template;
@@ -17,16 +18,31 @@ public abstract class AbstractException extends Exception {
 
 	public AbstractException(String message, BindingResult result, Object... args) {
 		super(String.format(message, args));
+		this.result = result;
 		globalErrors = getGlobalErrorsValues(result.getGlobalErrors());
 		fieldErrors = getFieldErrorsValues(result.getFieldErrors());
 	}
 
 	public AbstractException(BindingResult result, String template, Object... args) {
 		super();
+		this.result = result;
 		globalErrors = getGlobalErrorsValues(result.getGlobalErrors());
 		fieldErrors = getFieldErrorsValues(result.getFieldErrors());
 		this.template = template;
 		this.args = args;
+	}
+
+	public AbstractException(BindingResult result, String template, Throwable cause, Object... args) {
+		super(cause);
+		this.result = result;
+		globalErrors = getGlobalErrorsValues(result.getGlobalErrors());
+		fieldErrors = getFieldErrorsValues(result.getFieldErrors());
+		this.template = template;
+		this.args = args;
+	}
+
+	public BindingResult getResult() {
+		return result;
 	}
 
 	private List<String> getGlobalErrorsValues(List<ObjectError> globalErrors) {

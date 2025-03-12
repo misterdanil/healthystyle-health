@@ -1,42 +1,41 @@
 package org.healthystyle.health.service.dto.diet;
 
-import java.time.Instant;
 import java.time.LocalTime;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
-import org.healthystyle.health.service.error.diet.MealNotFoundException;
-import org.healthystyle.health.service.error.diet.MealSaveException;
 import org.healthystyle.health.service.validation.annotation.XORNotNull;
-import org.springframework.validation.MapBindingResult;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 @XORNotNull(fields = { "foodIds",
 		"foodSetId" }, message = "Должна быть указана либо еда, либо набор еды, но не то и не другое")
 public class MealSaveRequest {
-	private List<Long> foodIds;
-	private Long foodSetId;
+	@NotEmpty(message = "Укажите хотя бы одно блюдо")
+	private List<MealFoodSaveRequest> mealFoods;
 	@NotNull(message = "Укажите время приёма пищи")
 	private LocalTime time;
 	@NotNull(message = "Укажите день приёма пищи")
 	private Integer day;
 
-	public List<Long> getFoodIds() {
-		return foodIds;
+	public MealSaveRequest() {
+		super();
 	}
 
-	public void setFoodIds(List<Long> foodIds) {
-		this.foodIds = foodIds;
+	public MealSaveRequest(List<MealFoodSaveRequest> mealFoods, LocalTime time, Integer day) {
+		super();
+		this.mealFoods = mealFoods;
+		this.time = time;
+		this.day = day;
 	}
 
-	public Long getFoodSetId() {
-		return foodSetId;
+	public List<MealFoodSaveRequest> getMealFoods() {
+		return mealFoods;
 	}
 
-	public void setFoodSetId(Long foodSetId) {
-		this.foodSetId = foodSetId;
+	public void setMealFoods(List<MealFoodSaveRequest> mealFoods) {
+		this.mealFoods = mealFoods;
 	}
 
 	public LocalTime getTime() {
@@ -57,7 +56,7 @@ public class MealSaveRequest {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(day, foodIds, foodSetId, time);
+		return Objects.hash(day, mealFoods, time);
 	}
 
 	@Override
@@ -69,14 +68,8 @@ public class MealSaveRequest {
 		if (getClass() != obj.getClass())
 			return false;
 		MealSaveRequest other = (MealSaveRequest) obj;
-		return Objects.equals(day, other.day) && Objects.equals(foodIds, other.foodIds)
-				&& Objects.equals(foodSetId, other.foodSetId) && Objects.equals(time, other.time);
-	}
-	
-
-	public static void main(String[] args) throws MealSaveException {
-		MealSaveException e = new MealSaveException();
-		throw e;
+		return Objects.equals(day, other.day) && Objects.equals(mealFoods, other.mealFoods)
+				&& Objects.equals(time, other.time);
 	}
 
 }
