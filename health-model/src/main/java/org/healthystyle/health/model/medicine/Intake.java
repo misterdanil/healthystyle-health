@@ -1,6 +1,6 @@
 package org.healthystyle.health.model.medicine;
 
-import java.time.Instant;
+import java.time.LocalTime;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -29,7 +29,7 @@ public class Intake {
 	private Plan plan;
 	@Temporal(TemporalType.TIME)
 	@Column(nullable = false)
-	private Instant time;
+	private LocalTime time;
 	@Column(nullable = false, columnDefinition = "INTEGER CONSTRAINT intake_day_check CHECK (day >= 0 AND day <= 6)")
 	private Integer day;
 
@@ -37,7 +37,7 @@ public class Intake {
 		super();
 	}
 
-	public Intake(Plan plan, Instant time, Integer day) {
+	public Intake(Plan plan, LocalTime time, Integer day) {
 		super();
 
 		Objects.requireNonNull(plan, "Plan must be not null");
@@ -57,11 +57,11 @@ public class Intake {
 		return plan;
 	}
 
-	public Instant getTime() {
+	public LocalTime getTime() {
 		return time;
 	}
 
-	public void setTime(Instant time) {
+	public void setTime(LocalTime time) {
 		this.time = time;
 	}
 

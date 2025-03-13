@@ -1,20 +1,25 @@
 package org.healthystyle.health.model.medicine;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.healthystyle.health.model.Health;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -30,6 +35,8 @@ public class Plan {
 	@ManyToOne
 	@JoinColumn(name = "medicine_id", nullable = false)
 	private Medicine medicine;
+	@OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<Intake> intakes;
 	private String weight;
 	@Enumerated(EnumType.STRING)
 	private Sequence sequence;
@@ -74,6 +81,21 @@ public class Plan {
 
 	public void setMedicine(Medicine medicine) {
 		this.medicine = medicine;
+	}
+
+	public List<Intake> getIntakes() {
+		if (intakes == null) {
+			intakes = new ArrayList<>();
+		}
+		return intakes;
+	}
+
+	public void addIntake(Intake intake) {
+		getIntakes().add(intake);
+	}
+
+	public void addIntakes(List<Intake> intakes) {
+		getIntakes().addAll(intakes);
 	}
 
 	public String getWeight() {
