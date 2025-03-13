@@ -31,7 +31,7 @@ public class FoodSet {
 	@Column(nullable = false, unique = true)
 	private String title;
 	@ManyToMany
-	@JoinTable(joinColumns = @JoinColumn(name = "food_set_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "food_id", nullable = false))
+	@JoinTable(name = "food_set_food", joinColumns = @JoinColumn(name = "food_set_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "food_id", nullable = false))
 	private List<Food> foods;
 	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	private Instant createdOn;
@@ -43,18 +43,18 @@ public class FoodSet {
 		super();
 	}
 
-	public FoodSet(String title, Health health, Food... foods) {
+	public FoodSet(String title, Health health, List<Food> foods) {
 		super();
 
 		Objects.requireNonNull(title, "Title must be not null");
 		Objects.requireNonNull(health, "Health must be not null");
 		Objects.requireNonNull(foods, "Foods must be not null");
-		if (foods.length == 0) {
+		if (foods.size() == 0) {
 			throw new IllegalArgumentException("Must be passed at least one food");
 		}
 
 		this.title = title;
-		this.foods = new ArrayList<Food>(Arrays.asList(foods));
+		this.foods = foods;
 	}
 
 	public Long getId() {
@@ -79,6 +79,10 @@ public class FoodSet {
 
 	public void addFood(Food food) {
 		getFoods().add(food);
+	}
+
+	public void addFoods(List<Food> foods) {
+		getFoods().addAll(foods);
 	}
 
 	public Instant getCreatedOn() {

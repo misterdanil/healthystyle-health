@@ -2,10 +2,12 @@ package org.healthystyle.health.service.diet.impl;
 
 import static java.util.Map.entry;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.healthystyle.health.model.Health;
 import org.healthystyle.health.model.diet.Food;
@@ -76,6 +78,21 @@ public class FoodServiceImpl implements FoodService {
 		LOG.info("Got food by id '{}' successfully");
 
 		return food.get();
+	}
+
+	@Override
+	public List<Food> findByIds(Set<Long> ids) throws ValidationException {
+		LOG.debug("Checking ids for not null: {}", ids);
+		if(ids == null || ids.isEmpty()) {
+			BindingResult result = new MapBindingResult(new HashMap<>(), "food");
+			result.reject("food.find.ids.not_empty", "Укажите идентификаторы еды для поиска");
+			throw new ValidationException("Exception occurred while fetching foods by ids. The ids is null", result);
+		}
+		
+		List<Food> foods = repository.findByIds(ids);
+		LOG.debug("Got foods successfully by ids: {}", ids);
+		
+		return foods;
 	}
 
 	@Override
