@@ -2,21 +2,27 @@ package org.healthystyle.health.service.diet.impl;
 
 import static java.util.Map.entry;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.healthystyle.health.model.Health;
 import org.healthystyle.health.model.diet.Food;
+import org.healthystyle.health.model.diet.FoodValue;
 import org.healthystyle.health.repository.diet.FoodRepository;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.diet.FoodService;
+import org.healthystyle.health.service.diet.FoodValueService;
 import org.healthystyle.health.service.dto.diet.FoodSaveRequest;
 import org.healthystyle.health.service.dto.diet.FoodUpdateRequest;
+import org.healthystyle.health.service.dto.diet.FoodValueSaveRequest;
 import org.healthystyle.health.service.error.ValidationException;
+import org.healthystyle.health.service.error.diet.ConvertTypeMismatchException;
 import org.healthystyle.health.service.error.diet.FoodExistException;
 import org.healthystyle.health.service.error.diet.FoodNotFoundException;
+import org.healthystyle.health.service.error.diet.FoodValueExistException;
+import org.healthystyle.health.service.error.diet.NutritionValueNotFoundException;
 import org.healthystyle.health.service.helper.MethodNameHelper;
 import org.healthystyle.health.service.log.LogTemplate;
 import org.healthystyle.health.service.validation.ParamsChecker;
@@ -39,6 +45,8 @@ public class FoodServiceImpl implements FoodService {
 	private Validator validator;
 	@Autowired
 	private HealthAccessor healthAccessor;
+	@Autowired
+	private FoodValueService foodValueService;
 
 	private static final Integer MAX_SIZE = 25;
 
@@ -130,7 +138,9 @@ public class FoodServiceImpl implements FoodService {
 	}
 
 	@Override
-	public Food save(FoodSaveRequest saveRequest) throws ValidationException, FoodExistException {
+	public Food save(FoodSaveRequest saveRequest)
+			throws ValidationException, FoodExistException, NutritionValueNotFoundException, FoodValueExistException,
+			FoodNotFoundException, ConvertTypeMismatchException {
 		LOG.debug("Validating the data: {}", saveRequest);
 		BindingResult result = new BeanPropertyBindingResult(saveRequest, "food");
 		validator.validate(saveRequest, result);
@@ -148,17 +158,84 @@ public class FoodServiceImpl implements FoodService {
 			result.reject("food.save.title.exists", "Еда с таким названием уже существует");
 			throw new FoodExistException(title, result);
 		}
+
+		LOG.debug("Saving food: {}", saveRequest);
+		Food food = new Food(title, health);
+		food = repository.save(food);
+
+		List<FoodValueSaveRequest> foodValues = saveRequest.getFoodValues();
+		if (foodValues != null && !foodValues.isEmpty()) {
+			LOG.debug("Saving food values: {}", saveRequest);
+			for (FoodValueSaveRequest foodValue : foodValues) {
+				LOG.debug("Saving food value: {}", foodValue);
+				FoodValue savedFoodValue = foodValueService.save(foodValue, food.getId());
+				LOG.debug("Adding food value '{}' to food '{}'", savedFoodValue, food);
+				food.addFoodValue(savedFoodValue);
+			}
+		}
+
+		LOG.info("Food was saved successfully: {}", food);
+
+		return food;
 	}
 
 	@Override
-	public void update(FoodUpdateRequest updateRequest) throws ValidationException {
-		// TODO Auto-generated method stub
+	public void update(FoodUpdateRequest updateRequest, Long foodId)
+			throws ValidationException, FoodNotFoundException, FoodExistException {
+		LOG.debug("Validating food '{}' and food id '{}'", updateRequest, foodId);
+		BindingResult result = new BeanPropertyBindingResult(updateRequest, "food");
+		validator.validate(updateRequest, result);
+		if (foodId == null) {
+			result.reject("food.update.food_id.not_null", "Введите еду, для которой вы хотите изменить данные");
+		}
+		if (result.hasErrors()) {
+			throw new ValidationException(
+					"Exception occurred while updating food. The data is invalid. Food: %s. Food id: %s. Result: %s",
+					result, updateRequest, foodId, result);
+		}
 
+		LOG.debug("Checking food for existence by id '{}'", foodId);
+		Food food = findById(foodId);
+
+		LOG.debug("Getting health to update food. Food: {}. Food id: {}", updateRequest, foodId);
+		Health health = healthAccessor.getHealth();
+
+		String title = updateRequest.getTitle();
+		if (!title.equals(food.getTitle())) {
+			LOG.debug("Checking new title for existence. Food: {}. Food id: {}", updateRequest, foodId);
+			if (repository.existsByTitle(title, health.getId())) {
+				result.reject("food.update.title.exists", "Еда с таким названием уже существует");
+				throw new FoodExistException(title, result);
+			}
+			food.setTitle(title);
+		}
+
+		LOG.debug("The data is OK. Food: {}. Food id: {}", food, foodId);
+
+		repository.save(food);
+		LOG.info("The food was updated successfully: {}", food);
 	}
 
 	@Override
-	public void deleteById(Long id) throws FoodNotFoundException {
-		// TODO Auto-generated method stub
+	public void deleteById(Long id) throws FoodNotFoundException, ValidationException {
+		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "food");
+
+		LOG.debug("Checking id for not null: {}", id);
+		if (id == null) {
+			result.reject("food.delete.id.not_null", "Укажите идентификатор для удаления еды");
+			throw new ValidationException("Exception occurred while deleting food by id. The id is null", result);
+		}
+
+		LOG.debug("Checking food for existence by id '{}'", id);
+		if (!repository.existsById(id)) {
+			result.reject("food.delete.id.not_exists");
+			throw new FoodNotFoundException(result, id);
+		}
+
+		LOG.debug("The id is OK: {}", id);
+
+		repository.deleteById(id);
+		LOG.info("The food was deleted successfully by id: {}", id);
 	}
 
 }

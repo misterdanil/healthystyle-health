@@ -1,12 +1,14 @@
 package org.healthystyle.health.service.dto.diet;
 
+import org.healthystyle.health.model.diet.Value;
+
 import jakarta.validation.constraints.NotNull;
 
 public class FoodValueSaveRequest {
 	@NotNull(message = "Введите значение для пищевой ценности")
 	private String value;
 	@NotNull(message = "Укажите пищевую ценность")
-	private Long nutritionValueId;
+	private Value nutritionValue;
 
 	public String getValue() {
 		return value;
@@ -16,12 +18,12 @@ public class FoodValueSaveRequest {
 		this.value = value;
 	}
 
-	public Long getNutritionValueId() {
-		return nutritionValueId;
+	public Value getNutritionValue() {
+		return nutritionValue;
 	}
 
-	public void setNutritionValueId(Long nutritionValueId) {
-		this.nutritionValueId = nutritionValueId;
+	public void setNutritionValue(Value nutritionValue) {
+		this.nutritionValue = nutritionValue;
 	}
 
 }
