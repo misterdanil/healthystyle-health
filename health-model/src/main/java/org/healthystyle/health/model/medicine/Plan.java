@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 
 import org.healthystyle.health.model.Health;
+import org.healthystyle.health.model.measure.Measure;
+import org.healthystyle.health.model.measure.convert.ConvertType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -37,7 +39,9 @@ public class Plan {
 	private Medicine medicine;
 	@OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<Intake> intakes;
-	private String weight;
+//	private String weight;
+//	private Measure measure;
+//	private ConvertType convertType;
 	@Enumerated(EnumType.STRING)
 	private Sequence sequence;
 	@Temporal(TemporalType.DATE)
@@ -57,16 +61,18 @@ public class Plan {
 		super();
 	}
 
-	public Plan(Medicine medicine, Instant start, Treatment treatment, Health health) {
+	public Plan(Medicine medicine, Instant start, Instant end, Treatment treatment, Health health) {
 		super();
 
 		Objects.requireNonNull(medicine, "Medicine must be not null");
 		Objects.requireNonNull(start, "Start must be not null");
+		Objects.requireNonNull(end, "End must be not null");
 		Objects.requireNonNull(treatment, "Treatment must be not null");
 		Objects.requireNonNull(health, "Health must be not null");
 
 		this.medicine = medicine;
 		this.start = start;
+		this.end = end;
 		this.treatment = treatment;
 		this.health = health;
 	}
@@ -98,13 +104,29 @@ public class Plan {
 		getIntakes().addAll(intakes);
 	}
 
-	public String getWeight() {
-		return weight;
-	}
-
-	public void setWeight(String weight) {
-		this.weight = weight;
-	}
+//	public String getWeight() {
+//		return weight;
+//	}
+//
+//	public void setWeight(String weight) {
+//		this.weight = weight;
+//	}
+//
+//	public Measure getMeasure() {
+//		return measure;
+//	}
+//
+//	public void setMeasure(Measure measure) {
+//		this.measure = measure;
+//	}
+//
+//	public ConvertType getConvertType() {
+//		return convertType;
+//	}
+//
+//	public void setConvertType(ConvertType convertType) {
+//		this.convertType = convertType;
+//	}
 
 	public Sequence getSequence() {
 		return sequence;

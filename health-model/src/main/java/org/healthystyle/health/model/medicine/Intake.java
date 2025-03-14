@@ -3,6 +3,9 @@ package org.healthystyle.health.model.medicine;
 import java.time.LocalTime;
 import java.util.Objects;
 
+import org.healthystyle.health.model.measure.Measure;
+import org.healthystyle.health.model.measure.convert.ConvertType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +35,13 @@ public class Intake {
 	private LocalTime time;
 	@Column(nullable = false, columnDefinition = "INTEGER CONSTRAINT intake_day_check CHECK (day >= 0 AND day <= 6)")
 	private Integer day;
+	private String weight;
+	@ManyToOne
+	@JoinColumn(name = "measure_id")
+	private Measure measure;
+	@ManyToOne
+	@JoinColumn(name = "convert_type_id")
+	private ConvertType convertType;
 
 	public Intake() {
 		super();
@@ -71,6 +81,30 @@ public class Intake {
 
 	public void setDay(Integer day) {
 		this.day = day;
+	}
+
+	public String getWeight() {
+		return weight;
+	}
+
+	public void setWeight(String weight) {
+		this.weight = weight;
+	}
+
+	public Measure getMeasure() {
+		return measure;
+	}
+
+	public void setMeasure(Measure measure) {
+		this.measure = measure;
+	}
+
+	public ConvertType getConvertType() {
+		return convertType;
+	}
+
+	public void setConvertType(ConvertType convertType) {
+		this.convertType = convertType;
 	}
 
 }

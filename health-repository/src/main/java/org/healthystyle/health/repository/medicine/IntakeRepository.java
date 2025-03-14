@@ -37,7 +37,7 @@ public interface IntakeRepository extends JpaRepository<Intake, Long> {
 			+ "SELECT i FROM intake i INNER JOIN plan p ON i.plan_id = p.id WHERE CURRENT_DATE BETWEEN d.start AND d.end AND i.day = extract(dow FROM CURRENT_DATE) AND i.time == nextMealTime OFFSET (:page - 1) LIMIT :limit")
 	Page<Intake> findNextIntake(Long healthId, int page, int limit);
 
-	@Query("SELECT EXISTS (SELECT i FROM Intake i WHERE i.time = :time AND i.day = :day AND i.plan.id = :planId)")
+	@Query("SELECT EXISTS (SELECT i FROM Intake i INNER JOIN i.plan p WHERE i.time = :time AND i.day = :day AND p.id = :planId)")
 	boolean existsByTimeAndDayAndPlanId(LocalTime time, Integer day, Long planId);
 
 	public static void main(String[] args) {

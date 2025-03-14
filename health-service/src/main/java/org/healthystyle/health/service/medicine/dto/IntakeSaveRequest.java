@@ -2,6 +2,8 @@ package org.healthystyle.health.service.medicine.dto;
 
 import java.time.LocalTime;
 
+import org.healthystyle.health.model.measure.Type;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +15,8 @@ public class IntakeSaveRequest {
 	@Min(value = 0, message = "Минимальное значение для дня - 0")
 	@Max(value = 6, message = "Максимальное значение для дня - 6")
 	private Integer day;
+	private String weight;
+	private Type measureType;
 
 	public LocalTime getTime() {
 		return time;
@@ -28,6 +32,22 @@ public class IntakeSaveRequest {
 
 	public void setDay(Integer day) {
 		this.day = day;
+	}
+
+	public String getWeight() {
+		return weight;
+	}
+
+	public void setWeight(String weight) {
+		this.weight = weight;
+	}
+
+	public Type getMeasureType() {
+		return measureType;
+	}
+
+	public void setMeasureType(Type measureType) {
+		this.measureType = measureType;
 	}
 
 }

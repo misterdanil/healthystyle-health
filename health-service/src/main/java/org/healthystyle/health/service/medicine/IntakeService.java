@@ -4,7 +4,12 @@ import java.time.Instant;
 
 import org.healthystyle.health.model.medicine.Intake;
 import org.healthystyle.health.service.error.ValidationException;
+import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
+import org.healthystyle.health.service.error.measure.MeasureNotFoundException;
+import org.healthystyle.health.service.error.medicine.IntakeExistException;
 import org.healthystyle.health.service.error.medicine.IntakeNotFoundException;
+import org.healthystyle.health.service.error.medicine.PlanNotFoundException;
+import org.healthystyle.health.service.error.medicine.WeightNegativeOrZeroException;
 import org.healthystyle.health.service.helper.MethodNameHelper;
 import org.healthystyle.health.service.medicine.dto.IntakeSaveRequest;
 import org.healthystyle.health.service.medicine.dto.IntakeUpdateRequest;
@@ -25,7 +30,7 @@ public interface IntakeService {
 			"findPlanned", int.class, int.class);
 	static final String[] FIND_NEXT_INTAKE_PARAM_NAMES = MethodNameHelper.getMethodParamNames(IntakeService.class,
 			"findNextIntake", int.class, int.class);
-	
+
 	Intake findById(Long id) throws ValidationException, IntakeNotFoundException;
 
 	Page<Intake> findByMedicine(String name, int page, int limit) throws ValidationException;
@@ -42,9 +47,13 @@ public interface IntakeService {
 
 	Page<Intake> findNextIntake(int page, int limit) throws ValidationException;
 
-	Intake save(IntakeSaveRequest saveRequest, Long planId) throws ValidationException;
+	Intake save(IntakeSaveRequest saveRequest, Long planId)
+			throws ValidationException, PlanNotFoundException, IntakeExistException, WeightNegativeOrZeroException,
+			ConvertTypeNotRecognizedException, MeasureNotFoundException;
 
-	void update(IntakeUpdateRequest updateRequest, Long intakeId) throws ValidationException, IntakeNotFoundException;
+	void update(IntakeUpdateRequest updateRequest, Long intakeId)
+			throws ValidationException, IntakeNotFoundException, MeasureNotFoundException,
+			WeightNegativeOrZeroException, ConvertTypeNotRecognizedException, IntakeExistException;
 
 	void deleteById(Long id) throws ValidationException, IntakeNotFoundException;
 }

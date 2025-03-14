@@ -8,13 +8,25 @@ import java.util.LinkedHashMap;
 import java.util.Optional;
 
 import org.healthystyle.health.model.Health;
+import org.healthystyle.health.model.measure.Measure;
+import org.healthystyle.health.model.measure.Type;
+import org.healthystyle.health.model.measure.convert.ConvertType;
+import org.healthystyle.health.model.measure.convert.FloatNumber;
+import org.healthystyle.health.model.measure.convert.IntegerNumber;
 import org.healthystyle.health.model.medicine.Intake;
 import org.healthystyle.health.model.medicine.Plan;
 import org.healthystyle.health.repository.medicine.IntakeRepository;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.error.ValidationException;
+import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
+import org.healthystyle.health.service.error.measure.MeasureNotFoundException;
+import org.healthystyle.health.service.error.medicine.IntakeExistException;
 import org.healthystyle.health.service.error.medicine.IntakeNotFoundException;
+import org.healthystyle.health.service.error.medicine.PlanNotFoundException;
+import org.healthystyle.health.service.error.medicine.WeightNegativeOrZeroException;
 import org.healthystyle.health.service.log.LogTemplate;
+import org.healthystyle.health.service.measure.MeasureService;
+import org.healthystyle.health.service.measure.convert.ConvertTypeService;
 import org.healthystyle.health.service.medicine.IntakeService;
 import org.healthystyle.health.service.medicine.PlanService;
 import org.healthystyle.health.service.medicine.dto.IntakeSaveRequest;
@@ -39,6 +51,10 @@ public class IntakeServiceImpl implements IntakeService {
 	private PlanService planService;
 	@Autowired
 	private HealthAccessor healthAccessor;
+	@Autowired
+	private ConvertTypeService convertTypeService;
+	@Autowired
+	private MeasureService measureService;
 
 	private static final Integer MAX_SIZE = 25;
 
@@ -249,10 +265,17 @@ public class IntakeServiceImpl implements IntakeService {
 	}
 
 	@Override
-	public Intake save(IntakeSaveRequest saveRequest, Long planId) throws ValidationException {
+	public Intake save(IntakeSaveRequest saveRequest, Long planId)
+			throws ValidationException, PlanNotFoundException, IntakeExistException, WeightNegativeOrZeroException,
+			ConvertTypeNotRecognizedException, MeasureNotFoundException {
 		LOG.debug("Validating intake '{}' and plane id '{}'", saveRequest, planId);
 		BindingResult result = new BeanPropertyBindingResult(saveRequest, "intake");
 		validator.validate(saveRequest, result);
+		String weight = saveRequest.getWeight();
+		Type measureType = saveRequest.getMeasureType();
+		if (weight != null && measureType == null) {
+			result.rejectValue("measure", "intake.save.measure.not_null", "Укажите единицу измерения для веса");
+		}
 		if (planId == null) {
 			result.reject("intake.save.plan_id.not_null",
 					"Укажите идентификатор плана для добавления приёма лекарства");
@@ -272,19 +295,44 @@ public class IntakeServiceImpl implements IntakeService {
 		LocalTime time = saveRequest.getTime().truncatedTo(ChronoUnit.MINUTES);
 		LOG.debug("Time from '{}' to '{}'", saveRequest.getTime(), time);
 
-		Intake intake = new Intake(plan, time, saveRequest.getDay());
+		Integer day = saveRequest.getDay();
+
+		if (repository.existsByTimeAndDayAndPlanId(time, day, planId)) {
+			result.reject("intake.save.exists", "Уже существует приём лекарства с данными временными параметрами");
+			throw new IntakeExistException(time, day, planId, result);
+		}
+
+		Intake intake = new Intake(plan, time, day);
+
+		if (weight != null) {
+			LOG.debug("Recognizing weight convert type: {}", saveRequest);
+			ConvertType convertType = ParamsChecker.checkConvertType(weight, convertTypeService, result);
+
+			LOG.debug("Checking measure for existence by type '{}'", measureType);
+			Measure measure = measureService.findByType(measureType);
+			intake.setWeight(weight);
+			intake.setMeasure(measure);
+			intake.setConvertType(convertType);
+		}
+
 		repository.save(intake);
 		LOG.info("Intake was saved successfully: {}", intake);
 
 		return intake;
-
 	}
 
 	@Override
-	public void update(IntakeUpdateRequest updateRequest, Long intakeId) throws ValidationException, IntakeNotFoundException {
+	public void update(IntakeUpdateRequest updateRequest, Long intakeId)
+			throws ValidationException, IntakeNotFoundException, MeasureNotFoundException,
+			WeightNegativeOrZeroException, ConvertTypeNotRecognizedException, IntakeExistException {
 		LOG.debug("Validating intake '{}' and intake id '{}'", updateRequest, intakeId);
 		BindingResult result = new BeanPropertyBindingResult(updateRequest, "intake");
 		validator.validate(updateRequest, result);
+		String weight = updateRequest.getWeight();
+		Type measureType = updateRequest.getMeasure();
+		if (weight != null && measureType == null) {
+			result.rejectValue("measure", "intake.save.measure.not_null", "Укажите единицу измерения для веса");
+		}
 		if (intakeId == null) {
 			result.reject("intake.update.id.not_null", "Укажите идентификатор приёма лекарств для обновления");
 		}
@@ -300,13 +348,35 @@ public class IntakeServiceImpl implements IntakeService {
 		LOG.debug("The data is valid. Intake: {}. Intake id: {}", updateRequest, intakeId);
 
 		LocalTime time = updateRequest.getTime().truncatedTo(ChronoUnit.MINUTES);
-		if (!time.equals(intake.getTime())) {
+		Integer day = updateRequest.getDay();
+		if (!time.equals(intake.getTime()) || day != intake.getDay()) {
+			Long planId = intake.getPlan().getId();
+			if (repository.existsByTimeAndDayAndPlanId(time, day, planId)) {
+				result.reject("intake.update.exists",
+						"С данными временными параметрами уже существуем приём лекарства в данном плане");
+				throw new IntakeExistException(time, day, planId, result);
+			}
 			intake.setTime(time);
+			intake.setDay(day);
 		}
 
-		Integer day = updateRequest.getDay();
-		if (day != intake.getDay()) {
-			intake.setDay(day);
+		if (weight != null && !weight.equals(intake.getWeight())) {
+			LOG.debug("Recognizing weight convert type '{}' for intake '{}'", updateRequest, intakeId);
+			ConvertType convertType = ParamsChecker.checkConvertType(weight, convertTypeService, result);
+
+			intake.setWeight(weight);
+			intake.setConvertType(convertType);
+		} else if (weight == null) {
+			intake.setWeight(null);
+			intake.setConvertType(null);
+			intake.setMeasure(null);
+		}
+
+		Measure measure = intake.getMeasure();
+		if (weight != null && (measure == null || !measureType.equals(measure.getType()))) {
+			LOG.debug("Checking measure for existence by type '{}' for intake '{}'", measureType, intakeId);
+			measure = measureService.findByType(measureType);
+			intake.setMeasure(measure);
 		}
 
 		repository.save(intake);

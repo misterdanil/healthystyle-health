@@ -2,6 +2,12 @@ package org.healthystyle.health.service.validation;
 
 import java.time.Instant;
 
+import org.healthystyle.health.model.measure.convert.ConvertType;
+import org.healthystyle.health.model.measure.convert.FloatNumber;
+import org.healthystyle.health.model.measure.convert.IntegerNumber;
+import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
+import org.healthystyle.health.service.error.medicine.WeightNegativeOrZeroException;
+import org.healthystyle.health.service.measure.convert.ConvertTypeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindingResult;
@@ -42,5 +48,18 @@ public class ParamsChecker {
 			LOG.warn("From date '{}' is before to date '{}'", fromDate, toDate);
 			result.reject("*.*.date.mixed", "Дата начала должны быть раньше даты конца");
 		}
+	}
+
+	public static ConvertType checkConvertType(String weight, ConvertTypeService convertTypeService,
+			BindingResult result) throws WeightNegativeOrZeroException, ConvertTypeNotRecognizedException {
+		ConvertType convertType = convertTypeService.getConvertTypeByValue(weight);
+		if ((convertType instanceof IntegerNumber && Integer.valueOf(weight) <= 0)
+				|| (convertType instanceof FloatNumber && Float.valueOf(weight) <= 0)) {
+			result.rejectValue("weight", "intake.update.weight.negative_or_zero",
+					"Вес принимаемого лекарства должен быть больше нуля");
+			throw new WeightNegativeOrZeroException(weight, result);
+		}
+
+		return convertType;
 	}
 }
