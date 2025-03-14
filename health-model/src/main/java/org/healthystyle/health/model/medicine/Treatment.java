@@ -11,6 +11,7 @@ import org.healthystyle.health.model.Health;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,24 +32,23 @@ public class Treatment {
 	private Long id;
 	@Column(nullable = false, length = 1000)
 	private String description;
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "treatment")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "treatment", fetch = FetchType.EAGER)
 	private List<Plan> plans;
 	@ManyToOne
 	@JoinColumn(name = "health_id", nullable = false)
 	private Health health;
-	@Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@Column(nullable = false)
 	private Instant createdOn;
 
-	public Treatment(String description, Health health, Plan... plans) {
+	public Treatment(String description, Health health) {
 		super();
 
 		Objects.requireNonNull(description, "Description must be not null");
 		Objects.requireNonNull(health, "Health must be not null");
-		Objects.requireNonNull(plans, "Plans must be not null");
 
 		this.description = description;
-		this.plans = new ArrayList<>(Arrays.asList(plans));
 		this.health = health;
+		createdOn = Instant.now();
 	}
 
 	public Long getId() {

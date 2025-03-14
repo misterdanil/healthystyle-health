@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MedicineRepository extends JpaRepository<Medicine, Long> {
-	@Query("SELECT m FROM Medicine m INNER JOIN m.health h WHERE m.name LIKE '%:name%' AND h.id = :healthId")
+	@Query("SELECT m FROM Medicine m INNER JOIN m.health h WHERE LOWER(m.name) LIKE LOWER('%:name%') AND h.id = :healthId")
 	Page<Medicine> findByName(String name, Long healthId, Pageable pageable);
 
 	@Query("SELECT m FROM Medicine m INNER JOIN m.health h WHERE h.id = :healthId ORDER BY m.createdOn DESC")
