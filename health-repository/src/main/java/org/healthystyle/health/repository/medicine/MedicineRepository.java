@@ -14,4 +14,6 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
 
 	@Query("SELECT m FROM Medicine m INNER JOIN m.health h WHERE h.id = :healthId ORDER BY m.createdOn DESC")
 	Page<Medicine> find(Long healthId, Pageable pageable);
+	
+	boolean existsByName(String name, Long healthId);
 }
