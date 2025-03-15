@@ -1,6 +1,7 @@
 package org.healthystyle.health.model.medicine;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -24,19 +25,20 @@ public class Result {
 	@ManyToOne
 	@JoinColumn(name = "intake_id", nullable = false)
 	private Intake intake;
-	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	private Instant createdOn;
+	@Column(name = "created_on", nullable = false)
+	private LocalDate createdOn;
 
 	public Result() {
 		super();
 	}
 
-	public Result(Intake intake) {
+	public Result(Intake intake, LocalDate createdOn) {
 		super();
 
 		Objects.requireNonNull(intake, "Intake must be not null");
 
 		this.intake = intake;
+		this.createdOn = createdOn;
 	}
 
 	public Long getId() {
@@ -47,7 +49,7 @@ public class Result {
 		return intake;
 	}
 
-	public Instant getCreatedOn() {
+	public LocalDate getCreatedOn() {
 		return createdOn;
 	}
 

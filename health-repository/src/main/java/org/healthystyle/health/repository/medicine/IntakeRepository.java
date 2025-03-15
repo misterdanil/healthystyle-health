@@ -36,12 +36,11 @@ public interface IntakeRepository extends JpaRepository<Intake, Long> {
 			+ ")"
 			+ "SELECT i FROM intake i INNER JOIN plan p ON i.plan_id = p.id WHERE CURRENT_DATE BETWEEN d.start AND d.end AND i.day = extract(dow FROM CURRENT_DATE) AND i.time == nextMealTime OFFSET (:page - 1) LIMIT :limit")
 	Page<Intake> findNextIntake(Long healthId, int page, int limit);
+	
+	@Query(value = "SELECT d + m.time FROM plan p INNER JOIN health h ON h.id = p.health_id INNER JOIN intake i on i.plan_id = p.id INNER JOIN GENERATE_SERIES(p.start, p.end, interval '1' day) AS d ON extract(isodow from d) = m.day LEFT JOIN intake_result r ON r.intake_id = i.id AND EXTRACT(day FROM r.created_on) = EXTRACT(day FROM d) WHERE h.id = :healthId AND r IS NULL ORDER BY d DESC OFFSET (:page - 1) LIMIT :limit", nativeQuery = true)
+	Page<Intake> findNotExecuted(Long healthId, int page, int limit);
 
 	@Query("SELECT EXISTS (SELECT i FROM Intake i INNER JOIN i.plan p WHERE i.time = :time AND i.day = :day AND p.id = :planId)")
 	boolean existsByTimeAndDayAndPlanId(LocalTime time, Integer day, Long planId);
-
-	public static void main(String[] args) {
-		System.out.println(LocalTime.now().truncatedTo(ChronoUnit.MINUTES));
-	}
 
 }
