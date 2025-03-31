@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ConvertTypeRepository extends JpaRepository<ConvertType, Long> {
-	FloatNumber findByRanges(int ranges);
+	FloatNumber findByRange(int range);
 }

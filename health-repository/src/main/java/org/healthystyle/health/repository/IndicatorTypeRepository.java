@@ -22,9 +22,9 @@ public interface IndicatorTypeRepository extends JpaRepository<IndicatorType, Lo
 	Page<IndicatorType> findByMeasure(Type type, Pageable pageable);
 
 	@Query("SELECT it FROM IndicatorType it WHERE it.convertType = :convertType")
-	Page<IndicatorType> findByConvertType(ConvertType convertType);
+	Page<IndicatorType> findByConvertType(ConvertType convertType, Pageable pageable);
 
-	@Query("DELETE it FROM IndicatorType it WHERE it.id = :id")
+	@Query("DELETE FROM IndicatorType it WHERE it.id = :id")
 	@Modifying
 	void deleteById(Long id);
 

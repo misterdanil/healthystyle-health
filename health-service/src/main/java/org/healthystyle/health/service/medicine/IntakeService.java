@@ -1,6 +1,7 @@
 package org.healthystyle.health.service.medicine;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.healthystyle.health.model.medicine.Intake;
 import org.healthystyle.health.service.error.ValidationException;
@@ -39,13 +40,13 @@ public interface IntakeService {
 
 	Page<Intake> findByDay(Integer day, int page, int limit) throws ValidationException;
 
-	Page<Intake> findByDate(Instant date, int page, int limit) throws ValidationException;
+	List<Intake> findByDate(Instant date, int page, int limit) throws ValidationException;
 
-	Page<Intake> findByCurrentDate(int page, int limit) throws ValidationException;
+	List<Intake> findByCurrentDate(int page, int limit) throws ValidationException;
 
-	Page<Intake> findPlanned(int page, int limit) throws ValidationException;
+	List<Intake> findPlanned(int page, int limit) throws ValidationException;
 
-	Page<Intake> findNextIntake(int page, int limit) throws ValidationException;
+	List<Intake> findNextIntake(int page, int limit) throws ValidationException;
 
 	Intake save(IntakeSaveRequest saveRequest, Long planId)
 			throws ValidationException, PlanNotFoundException, IntakeExistException, WeightNegativeOrZeroException,

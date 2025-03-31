@@ -16,8 +16,6 @@ import org.healthystyle.health.model.diet.Meal;
 import org.healthystyle.health.repository.diet.MealRepository;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.diet.DietService;
-import org.healthystyle.health.service.diet.FoodService;
-import org.healthystyle.health.service.diet.FoodSetService;
 import org.healthystyle.health.service.diet.MealFoodService;
 import org.healthystyle.health.service.diet.MealFoodService.MealFoodNotFoundException;
 import org.healthystyle.health.service.diet.MealService;
@@ -59,10 +57,6 @@ public class MealServiceImpl implements MealService {
 	private HealthAccessor healthAccessor;
 	@Autowired
 	private DietService dietService;
-	@Autowired
-	private FoodService foodService;
-	@Autowired
-	private FoodSetService foodSetService;
 	@Autowired
 	private MealFoodService mealFoodService;
 
@@ -128,7 +122,7 @@ public class MealServiceImpl implements MealService {
 	}
 
 	@Override
-	public Page<Meal> findByDate(Instant date, int page, int limit) throws ValidationException {
+	public List<Meal> findByDate(Instant date, int page, int limit) throws ValidationException {
 		String params = LogTemplate
 				.getParamsTemplate(Map.ofEntries(entry("date", date), entry("page", page), entry("limit", limit)));
 
@@ -149,7 +143,7 @@ public class MealServiceImpl implements MealService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<Meal> meals = repository.findByDate(date, healthId, PageRequest.of(page, limit));
+		List<Meal> meals = repository.findByDate(date, healthId, page, limit);
 		LOG.info("Got meals by params {} successfully", params);
 
 		return meals;
@@ -184,7 +178,7 @@ public class MealServiceImpl implements MealService {
 	}
 
 	@Override
-	public Page<Meal> findPlanned(int page, int limit) throws ValidationException {
+	public List<Meal> findPlanned(int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(Map.ofEntries(entry("page", page), entry("limit", limit)));
 
 		LOG.debug("Validating params: {}", params);
@@ -201,7 +195,7 @@ public class MealServiceImpl implements MealService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<Meal> meals = repository.findPlanned(healthId, PageRequest.of(page, limit));
+		List<Meal> meals = repository.findPlanned(healthId, page, limit);
 		LOG.info("Got meals by params {} successfully", params);
 
 		return meals;

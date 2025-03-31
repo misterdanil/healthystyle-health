@@ -20,7 +20,7 @@ public interface MealFoodRepository extends JpaRepository<MealFood, Long> {
 	@Query("DELETE FROM MealFood mf WHERE mf.id IN :ids")
 	void deleteByIds(Set<Long> ids);
 
-	@Query("SELECT COUNT(mf) FROM MealFood mf WHERE mf.meal_id = :mealId")
+	@Query("SELECT COUNT(mf) FROM MealFood mf WHERE mf.meal.id = :mealId")
 	Integer countFoods(Long mealId);
 
 }

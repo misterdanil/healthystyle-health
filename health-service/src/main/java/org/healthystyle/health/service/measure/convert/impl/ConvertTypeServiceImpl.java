@@ -60,7 +60,7 @@ public class ConvertTypeServiceImpl implements ConvertTypeService {
 			Float.valueOf(value);
 			int ranges = value.substring(value.indexOf(".") + 1).length();
 			LOG.debug("Getting range: {}", ranges);
-			ConvertType type = repository.findByRanges(ranges);
+			ConvertType type = repository.findByRange(ranges);
 			if (type != null) {
 				return type;
 			}

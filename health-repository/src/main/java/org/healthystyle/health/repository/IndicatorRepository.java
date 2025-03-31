@@ -21,15 +21,15 @@ public interface IndicatorRepository extends JpaRepository<Indicator, Long> {
 	Page<Indicator> findChangesByIndicatorType(Long indicatorTypeId, Long healthId, Instant from, Instant to,
 			Pageable pageable);
 
-	@Query("SELECT new org.healthystyle.health.repository.result.AvgStatistic(DATE_TRUNC('week' FROM i.createdOn) AS weekly, TO_CHAR(AVG(CASE WHEN TYPE(ct) = IntegerNumber THEN CAST(i.value AS INTEGER) WHEN TYPE(ct) = FloatNumber THEN CAST(i.value AS FLOAT) END), 'FM999999990.09')) FROM Indicator i INNER JOIN i.indicatorType it INNER JOIN it.convertType ct WHERE it.id = :indicatorTypeId AND i.createdOn >= :from AND i.createdOn <= :to GROUP BY DATE_TRUNC('week' FROM i.createdOn) ORDER BY weekly")
+	@Query("SELECT new org.healthystyle.health.repository.result.AvgStatistic(DATE_TRUNC('week', i.createdOn) AS weekly, TO_CHAR(AVG(CASE WHEN TYPE(ct) = IntegerNumber THEN CAST(i.value AS INTEGER) WHEN TYPE(ct) = FloatNumber THEN CAST(i.value AS FLOAT) END), 'FM999999990.09')) FROM Indicator i INNER JOIN i.indicatorType it INNER JOIN it.convertType ct WHERE it.id = :indicatorTypeId AND i.createdOn >= :from AND i.createdOn <= :to AND i.health.id = :healthId GROUP BY DATE_TRUNC('week', i.createdOn) ORDER BY weekly")
 	Page<AvgStatistic> findChangesByIndicatorTypeWeeksRange(Long indicatorTypeId, Long healthId, Instant from,
 			Instant to, Pageable pageable);
 
-	@Query("SELECT new org.healthystyle.health.repository.result.AvgStatistic(DATE_TRUNC('year' FROM i.createdOn) AS year, TO_CHAR(AVG(CASE WHEN TYPE(ct) = IntegerNumber THEN CAST(i.value AS INTEGER) WHEN TYPE(ct) = FloatNumber THEN CAST(i.value AS FLOAT) END), 'FM999999990.09')) FROM Indicator i INNER JOIN i.indicatorType it INNER JOIN it.convertType ct WHERE it.id = :indicatorTypeId AND i.createdOn >= :from AND i.createdOn <= :to GROUP BY DATE_TRUNC('year' FROM i.createdOn) ORDER BY year")
+	@Query("SELECT new org.healthystyle.health.repository.result.AvgStatistic(DATE_TRUNC('year', i.createdOn) AS year, TO_CHAR(AVG(CASE WHEN TYPE(ct) = IntegerNumber THEN CAST(i.value AS INTEGER) WHEN TYPE(ct) = FloatNumber THEN CAST(i.value AS FLOAT) END), 'FM999999990.09')) FROM Indicator i INNER JOIN i.indicatorType it INNER JOIN it.convertType ct WHERE it.id = :indicatorTypeId AND i.createdOn >= :from AND i.createdOn <= :to AND i.health.id = :healthId GROUP BY DATE_TRUNC('year', i.createdOn) ORDER BY year")
 	Page<AvgStatistic> findChangesByIndicatorTypeYearsRange(Long indicatorTypeId, Long healthId, Instant from,
 			Instant to, Pageable pageable);
 
-	@Query("SELECT new org.healthystyle.health.repository.result.AvgStatistic(DATE_TRUNC('month' FROM i.createdOn) AS month, TO_CHAR(AVG(CASE WHEN TYPE(ct) = IntegerNumber THEN CAST(i.value AS INTEGER) WHEN TYPE(ct) = FloatNumber THEN CAST(i.value AS FLOAT) END), 'FM999999990.09')) FROM Indicator i INNER JOIN i.indicatorType it INNER JOIN it.convertType ct WHERE it.id = :indicatorTypeId AND i.createdOn >= :from AND i.createdOn <= :to) GROUP BY DATE_TRUNC('month' FROM i.createdOn) ORDER BY month")
+	@Query("SELECT new org.healthystyle.health.repository.result.AvgStatistic(DATE_TRUNC('month', i.createdOn) AS month, TO_CHAR(AVG(CASE WHEN TYPE(ct) = IntegerNumber THEN CAST(i.value AS INTEGER) WHEN TYPE(ct) = FloatNumber THEN CAST(i.value AS FLOAT) END), 'FM999999990.09')) FROM Indicator i INNER JOIN i.indicatorType it INNER JOIN it.convertType ct WHERE it.id = :indicatorTypeId AND i.createdOn >= :from AND i.createdOn <= :to AND i.health.id = :healthId GROUP BY DATE_TRUNC('month', i.createdOn) ORDER BY month")
 	Page<AvgStatistic> findChangesByIndicatorTypeMonthsRange(Long indicatorTypeId, Long healthId, Instant from,
 			Instant to, Pageable pageable);
 

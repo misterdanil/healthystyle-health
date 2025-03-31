@@ -42,7 +42,7 @@ public class Sport {
 	@Column(nullable = false)
 	private LocalDate start;
 	@Temporal(TemporalType.DATE)
-	@Column(nullable = false)
+	@Column(name = "finish", nullable = false)
 	private LocalDate end;
 	@ManyToOne
 	@JoinColumn(name = "health_id", nullable = false)

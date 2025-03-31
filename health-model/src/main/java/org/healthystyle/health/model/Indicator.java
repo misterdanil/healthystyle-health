@@ -22,7 +22,7 @@ public class Indicator {
 	@SequenceGenerator(name = "indicator_generator", sequenceName = "indicator_seq", initialValue = 1, allocationSize = 20)
 	@GeneratedValue(generator = "indicator_generator", strategy = GenerationType.SEQUENCE)
 	private Long id;
-	@Column(nullable = false, columnDefinition = "VARCHAR(100) CONSTRAINT indicator_value_check CHECK (~ '^[0-9][0-9]*\\.?[0-9]+$')")
+	@Column(nullable = false, columnDefinition = "VARCHAR(100) CONSTRAINT indicator_value_check CHECK (value ~ '^[0-9][0-9]*\\.?[0-9]+$')")
 	private String value;
 	@ManyToOne
 	@JoinColumn(name = "indicator_type_id", nullable = false)

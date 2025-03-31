@@ -29,11 +29,11 @@ public interface MealService {
 
 	Page<Meal> findByFoods(List<Long> foodIds, int page, int limit) throws ValidationException;
 
-	Page<Meal> findByDate(Instant date, int page, int limit) throws ValidationException;
+	List<Meal> findByDate(Instant date, int page, int limit) throws ValidationException;
 
 	Page<Meal> findByDay(Integer day, int page, int limit) throws ValidationException;
 
-	Page<Meal> findPlanned(int page, int limit) throws ValidationException;
+	List<Meal> findPlanned(int page, int limit) throws ValidationException;
 
 	List<Meal> findNextMeal(int page, int limit) throws ValidationException;
 

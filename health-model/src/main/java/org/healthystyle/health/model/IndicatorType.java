@@ -1,5 +1,6 @@
 package org.healthystyle.health.model;
 
+import java.time.Instant;
 import java.util.Objects;
 
 import org.healthystyle.health.model.measure.Measure;
@@ -24,7 +25,7 @@ public class IndicatorType {
 	@SequenceGenerator(name = "indicator_type_generator", sequenceName = "indicator_type_sequence", initialValue = 1, allocationSize = 5)
 	@GeneratedValue(generator = "indicator_type_generator", strategy = GenerationType.SEQUENCE)
 	private Long id;
-	@Column(nullable = false, columnDefinition = "VARCHAR(500) CONSTRAINT CK_indicator_type_name_check (~ '^\\p{Lu}[\\p{L}\\p{Z}0-9]+$')")
+	@Column(nullable = false, columnDefinition = "VARCHAR(500) CONSTRAINT CK_indicator_type_name CHECK (name ~ '^\\p{Lu}[\\p{L}\\p{Z}0-9]+$')")
 	private String name;
 	@ManyToOne
 	@JoinColumn(name = "measure_id", nullable = false)
@@ -34,6 +35,8 @@ public class IndicatorType {
 	private ConvertType convertType;
 	@Column(nullable = false)
 	private Long creator;
+	@Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	private Instant createdOn = Instant.now();
 
 	public IndicatorType() {
 		super();
@@ -84,4 +87,9 @@ public class IndicatorType {
 	public Long getCreator() {
 		return creator;
 	}
+
+	public Instant getCreatedOn() {
+		return createdOn;
+	}
+
 }

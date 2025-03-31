@@ -1,5 +1,6 @@
 package org.healthystyle.health.model.sport;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +35,8 @@ public class Exercise {
 	@ManyToOne
 	@JoinColumn(name = "health_id", nullable = false)
 	private Health health;
+	@Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	private Instant createdOn = Instant.now();
 
 	public Exercise() {
 		super();
@@ -84,4 +87,9 @@ public class Exercise {
 	public Health getHealth() {
 		return health;
 	}
+
+	public Instant getCreatedOn() {
+		return createdOn;
+	}
+
 }

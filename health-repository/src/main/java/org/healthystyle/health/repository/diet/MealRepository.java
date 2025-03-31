@@ -21,14 +21,14 @@ public interface MealRepository extends JpaRepository<Meal, Long>, CustomMealRep
 	@Query("SELECT m FROM Meal m INNER JOIN m.foods f WHERE f.id IN :foodIds")
 	Page<Meal> findByFoods(List<Long> foodIds, Long healthId, Pageable pageable);
 
-	@Query(value = "SELECT m FROM meal m INNER JOIN diet d ON d.id = m.diet_id WHERE CAST(:date AS date) BETWEEN d.start AND d.end AND m.day = extract(dow FROM :date) AND d.health_id = :healthId ORDER BY m.day, m.time", nativeQuery = true)
-	Page<Meal> findByDate(Instant date, Long healthId, Pageable pageable);
+	@Query(value = "SELECT m FROM meal m INNER JOIN diet d ON d.id = m.diet_id WHERE CAST(:date AS date) BETWEEN d.start AND d.end AND m.day = extract(dow FROM :date) AND d.health_id = :healthId ORDER BY m.day, m.time OFFSET (:page - 1) * :limit LIMIT :limit", nativeQuery = true)
+	List<Meal> findByDate(Instant date, Long healthId, int page, int limit);
 
 	@Query("SELECT m FROM Meal m INNER JOIN m.diet d INNER JOIN d.health h WHERE CURRENT_DATE BETWEEN d.start AND d.end AND m.day = :day AND h.id = :healthId ORDER BY m.time")
 	Page<Meal> findByDay(Integer day, Long healthId, Pageable pageable);
 
-	@Query(value = "SELECT m FROM meal m INNER JOIN diet d ON d.health_id = :healthId WHERE d.end >= CAST(CURRENT_TIME AS DATE) AND h.id = :healthId ORDER BY d.start, m.day >= extract(dow FROM CURRENT_TIMESTAMP) DESC, m.day, m.time >= CURRENT_TIME DESC, m.time", nativeQuery = true)
-	Page<Meal> findPlanned(Long healthId, Pageable pageable);
+	@Query(value = "SELECT m FROM meal m INNER JOIN diet d ON d.health_id = :healthId WHERE d.end >= CAST(CURRENT_TIME AS DATE) AND h.id = :healthId ORDER BY d.start, m.day >= extract(dow FROM CURRENT_TIMESTAMP) DESC, m.day, m.time >= CURRENT_TIME DESC, m.time OFFSET (:page - 1) * :limit LIMIT :limit", nativeQuery = true)
+	List<Meal> findPlanned(Long healthId, int page, int limit);
 
 	@Query(value = "WITH nextMealTime AS ("
 			+ "SELECT m.time FROM meal m INNER JOIN diet d ON m.diet_id = d.id INNER JOIN health h ON h.id = d.health_id WHERE CURRENT_DATE BETWEEN d.start AND d.end AND m.day = extract(dow FROM CURRENT_DATE) AND m.time >= CURRENT_TIME AND h.id = ?1 ORDER BY m.time LIMIT 1)"

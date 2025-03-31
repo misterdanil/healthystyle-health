@@ -3,6 +3,8 @@ package org.healthystyle.health.service.sport;
 import java.time.Instant;
 
 import org.healthystyle.health.model.sport.Result;
+import org.healthystyle.health.repository.result.DateStatistic;
+import org.healthystyle.health.repository.result.TimeStatistic;
 import org.healthystyle.health.service.dto.sport.ResultSaveRequest;
 import org.healthystyle.health.service.error.ValidationException;
 import org.healthystyle.health.service.error.sport.ResultExistException;
@@ -45,15 +47,15 @@ public interface ResultService {
 
 	Page<Result> find(int page, int limit) throws ValidationException;
 
-	Page<Result> findPercentageBySport(Long sportId, int page, int limit) throws ValidationException;
+	Page<DateStatistic> findPercentageBySport(Long sportId, int page, int limit) throws ValidationException;
 
-	Page<Result> findPercentageByTrain(Long trainId, int page, int limit) throws ValidationException;
+	Page<DateStatistic> findPercentageByTrain(Long trainId, int page, int limit) throws ValidationException;
 
-	Page<Result> findPercentageByDate(Instant date, int page, int limit) throws ValidationException;
+	Page<TimeStatistic> findPercentageByDate(Instant date, int page, int limit) throws ValidationException;
 
-	Page<Result> findPercentageRangeWeeks(Instant start, Instant end, int page, int limit) throws ValidationException;
+	Page<DateStatistic> findPercentageRangeWeeks(Instant start, Instant end, int page, int limit) throws ValidationException;
 
-	Page<Result> findPercentageRangeMonths(Instant start, Instant end, int page, int limit) throws ValidationException;
+	Page<DateStatistic> findPercentageRangeMonths(Instant start, Instant end, int page, int limit) throws ValidationException;
 
 	Result save(ResultSaveRequest saveRequest, Long setId)
 			throws ValidationException, ResultExistException, SetNotFoundException;

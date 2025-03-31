@@ -9,9 +9,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SportRepository extends JpaRepository<Sport, Long> {
-	@Query("SELECT s FROM Sport s INNER JOIN s.health h WHERE s.description LIKE '%:description%' AND h.id = :healthId ORDER BY CAST(CURRENT_TIMESTAMP AS DATE) >= s.start AND CAST(CURRENT_TIMESTAMP AS DATE) <= s.end, s.start")
+	@Query(value = "SELECT s FROM sport s WHERE LOWER(s.description) LIKE LOWER('%:description%') AND s.health_id = :healthId ORDER BY CAST(CURRENT_TIMESTAMP AS DATE) >= s.start AND CAST(CURRENT_TIMESTAMP AS DATE) <= s.end, s.start", nativeQuery = true)
 	Page<Sport> findByDescription(String description, Long healthId, Pageable pageable);
 
-	@Query("SELECT s FROM Sport s INNER JOIN s.trains t INNER JOIN s.health h WHERE CAST(CURRENT_TIMESTAMP AS DATE) >= CAST(s.start AS DATE) AND CAST(CURRENT_TIMESTAMP AS DATE) <= CAST(s.end AS DATE) AND h.id = :healthId ORDER BY s.start")
+	@Query("SELECT s FROM Sport s INNER JOIN s.trains t WHERE CAST(CURRENT_TIMESTAMP AS DATE) >= CAST(s.start AS DATE) AND CAST(CURRENT_TIMESTAMP AS DATE) <= CAST(s.end AS DATE) AND s.health.id = :healthId ORDER BY s.start")
 	Page<Sport> findActual(Long healthId, Pageable pageable);
 }

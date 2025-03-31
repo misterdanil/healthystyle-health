@@ -19,7 +19,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(indexes = @Index(name = "medicine_name_idx", columnList = "name, health", unique = true))
+@Table(indexes = @Index(name = "medicine_name_health_id_idx", columnList = "name, health_id", unique = true))
 public class Medicine {
 	@Id
 	@SequenceGenerator(name = "medicine_generator", sequenceName = "medicine_seq", initialValue = 1, allocationSize = 20)

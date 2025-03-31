@@ -5,14 +5,13 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.healthystyle.health.model.Health;
 import org.healthystyle.health.model.measure.Measure;
 import org.healthystyle.health.model.measure.Type;
 import org.healthystyle.health.model.measure.convert.ConvertType;
-import org.healthystyle.health.model.measure.convert.FloatNumber;
-import org.healthystyle.health.model.measure.convert.IntegerNumber;
 import org.healthystyle.health.model.medicine.Intake;
 import org.healthystyle.health.model.medicine.Plan;
 import org.healthystyle.health.repository.medicine.IntakeRepository;
@@ -37,11 +36,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.Validator;
 
+@Service
 public class IntakeServiceImpl implements IntakeService {
 	@Autowired
 	private IntakeRepository repository;
@@ -162,7 +163,7 @@ public class IntakeServiceImpl implements IntakeService {
 	}
 
 	@Override
-	public Page<Intake> findByDate(Instant date, int page, int limit) throws ValidationException {
+	public List<Intake> findByDate(Instant date, int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_BY_DATE_PARAM_NAMES, date, page, limit);
 
 		LOG.debug("Validating params: {}", params);
@@ -183,14 +184,14 @@ public class IntakeServiceImpl implements IntakeService {
 		LOG.debug("Getting health to get intakes: {}", params);
 		Health health = healthAccessor.getHealth();
 
-		Page<Intake> intakes = repository.findByDate(date, health.getId(), PageRequest.of(page, limit));
+		List<Intake> intakes = repository.findByDate(date, health.getId(), page, limit);
 		LOG.info("Got intakes successfully by params: {}", params);
 
 		return intakes;
 	}
 
 	@Override
-	public Page<Intake> findByCurrentDate(int page, int limit) throws ValidationException {
+	public List<Intake> findByCurrentDate(int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_BY_CURRENT_DATE_PARAM_NAMES, page, limit);
 
 		LOG.debug("Validating params: {}", params);
@@ -208,14 +209,14 @@ public class IntakeServiceImpl implements IntakeService {
 		LOG.debug("Getting health to get intakes: {}", params);
 		Health health = healthAccessor.getHealth();
 
-		Page<Intake> intakes = repository.findByCurrentDate(health.getId(), PageRequest.of(page, limit));
+		List<Intake> intakes = repository.findByCurrentDate(health.getId(), page, limit);
 		LOG.info("Got intakes successfully by params: {}", params);
 
 		return intakes;
 	}
 
 	@Override
-	public Page<Intake> findPlanned(int page, int limit) throws ValidationException {
+	public List<Intake> findPlanned(int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_PLANNED_PARAM_NAMES, page, limit);
 
 		LOG.debug("Validating params: {}", params);
@@ -233,14 +234,14 @@ public class IntakeServiceImpl implements IntakeService {
 		LOG.debug("Getting health to get intakes: {}", params);
 		Health health = healthAccessor.getHealth();
 
-		Page<Intake> intakes = repository.findPlanned(health.getId(), PageRequest.of(page, limit));
+		List<Intake> intakes = repository.findPlanned(health.getId(), page, limit);
 		LOG.info("Got intakes successfully by params: {}", params);
 
 		return intakes;
 	}
 
 	@Override
-	public Page<Intake> findNextIntake(int page, int limit) throws ValidationException {
+	public List<Intake> findNextIntake(int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_NEXT_INTAKE_PARAM_NAMES, page, limit);
 
 		LOG.debug("Validating params: {}", params);
@@ -258,7 +259,7 @@ public class IntakeServiceImpl implements IntakeService {
 		LOG.debug("Getting health to get intakes: {}", params);
 		Health health = healthAccessor.getHealth();
 
-		Page<Intake> intakes = repository.findNextIntake(health.getId(), page, limit);
+		List<Intake> intakes = repository.findNextIntake(health.getId(), page, limit);
 		LOG.info("Got intakes successfully by params: {}", params);
 
 		return intakes;

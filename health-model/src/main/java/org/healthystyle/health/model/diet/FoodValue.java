@@ -21,7 +21,7 @@ public class FoodValue {
 	@SequenceGenerator(name = "food_value_generator", sequenceName = "food_value_seq", initialValue = 1, allocationSize = 20)
 	@GeneratedValue(generator = "food_value_generator", strategy = GenerationType.SEQUENCE)
 	private Long id;
-	@Column(nullable = false, columnDefinition = "VARCHAR(25) CONSTRAINT food_value_value_check CHECK (~ '^[0-9][0-9]*\\.?[0-9]+$')")
+	@Column(nullable = false, columnDefinition = "VARCHAR(25) CONSTRAINT food_value_value_check CHECK (value ~ '^[0-9][0-9]*\\.?[0-9]+$')")
 	private String value;
 	@ManyToOne
 	@JoinColumn(name = "nutrition_value_id", nullable = false)

@@ -48,7 +48,7 @@ public class Plan {
 	@Column(nullable = false)
 	private Instant start;
 	@Temporal(TemporalType.DATE)
-	@Column(nullable = false)
+	@Column(name = "finish", nullable = false)
 	private Instant end;
 	@ManyToOne
 	@JoinColumn(name = "treatment_id", nullable = false)

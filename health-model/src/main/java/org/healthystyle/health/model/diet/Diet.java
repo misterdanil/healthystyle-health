@@ -25,7 +25,7 @@ import jakarta.persistence.TemporalType;
 
 @Entity
 @Table(indexes = { @Index(name = "diet_title_idx", columnList = "title", unique = true),
-		@Index(name = "diet_start_end_idx", columnList = "start, end") })
+		@Index(name = "diet_start_finish_idx", columnList = "start, finish") })
 public class Diet {
 	@Id
 	@SequenceGenerator(name = "diet_generator", sequenceName = "diet_seq", initialValue = 1, allocationSize = 5)
@@ -39,7 +39,7 @@ public class Diet {
 	@Column(nullable = false)
 	private Instant start;
 	@Temporal(TemporalType.DATE)
-	@Column(nullable = false)
+	@Column(name = "finish", nullable = false)
 	private Instant end;
 	@ManyToOne
 	@JoinColumn(name = "health_id", nullable = false)

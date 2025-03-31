@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import org.healthystyle.health.model.sport.Result;
 import org.healthystyle.health.model.sport.Set;
+import org.healthystyle.health.repository.result.DateStatistic;
+import org.healthystyle.health.repository.result.TimeStatistic;
 import org.healthystyle.health.repository.sport.ResultRepository;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.dto.sport.ResultSaveRequest;
@@ -177,7 +179,7 @@ public class ResultServiceImpl implements ResultService {
 	}
 
 	@Override
-	public Page<Result> findPercentageBySport(Long sportId, int page, int limit) throws ValidationException {
+	public Page<DateStatistic> findPercentageBySport(Long sportId, int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_PERCENTAGE_BY_SPORT_PARAM_NAMES, sportId, page, limit);
 
 		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "result");
@@ -192,14 +194,14 @@ public class ResultServiceImpl implements ResultService {
 
 		LOG.debug("The params are OK: {}", params);
 
-		Page<Result> results = repository.findPercentageBySport(sportId, PageRequest.of(page, limit));
+		Page<DateStatistic> results = repository.findPercentageBySport(sportId, PageRequest.of(page, limit));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;
 	}
 
 	@Override
-	public Page<Result> findPercentageByTrain(Long trainId, int page, int limit) throws ValidationException {
+	public Page<DateStatistic> findPercentageByTrain(Long trainId, int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_PERCENTAGE_BY_TRAIN_PARAM_NAMES, trainId, page, limit);
 
 		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "result");
@@ -214,14 +216,14 @@ public class ResultServiceImpl implements ResultService {
 
 		LOG.debug("The params are OK: {}", params);
 
-		Page<Result> results = repository.findPercentageByTrain(trainId, PageRequest.of(page, limit));
+		Page<DateStatistic> results = repository.findPercentageByTrain(trainId, PageRequest.of(page, limit));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;
 	}
 
 	@Override
-	public Page<Result> findPercentageByDate(Instant date, int page, int limit) throws ValidationException {
+	public Page<TimeStatistic> findPercentageByDate(Instant date, int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_PERCENTAGE_BY_DATE_PARAM_NAMES, date, page, limit);
 
 		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "result");
@@ -238,14 +240,14 @@ public class ResultServiceImpl implements ResultService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<Result> results = repository.findPercentageByDate(date, healthId, PageRequest.of(page, limit));
+		Page<TimeStatistic> results = repository.findPercentageByDate(date, healthId, PageRequest.of(page, limit));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;
 	}
 
 	@Override
-	public Page<Result> findPercentageRangeWeeks(Instant start, Instant end, int page, int limit)
+	public Page<DateStatistic> findPercentageRangeWeeks(Instant start, Instant end, int page, int limit)
 			throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_PERCENTAGE_RANGE_WEEKS_PARAM_NAMES, start, end, page, limit);
 
@@ -266,14 +268,14 @@ public class ResultServiceImpl implements ResultService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<Result> results = repository.findPercentageRangeWeeks(start, end, healthId, PageRequest.of(page, limit));
+		Page<DateStatistic> results = repository.findPercentageRangeWeeks(start, end, healthId, PageRequest.of(page, limit));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;
 	}
 
 	@Override
-	public Page<Result> findPercentageRangeMonths(Instant start, Instant end, int page, int limit)
+	public Page<DateStatistic> findPercentageRangeMonths(Instant start, Instant end, int page, int limit)
 			throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_PERCENTAGE_RANGE_MONTHS_PARAM_NAMES, start, end, page,
 				limit);
@@ -295,7 +297,7 @@ public class ResultServiceImpl implements ResultService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<Result> results = repository.findPercentageRangeMonths(start, end, healthId, PageRequest.of(page, limit));
+		Page<DateStatistic> results = repository.findPercentageRangeMonths(start, end, healthId, PageRequest.of(page, limit));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;

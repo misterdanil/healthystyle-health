@@ -21,7 +21,7 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
 	@Query("SELECT f FROM Food f INNER JOIN f.health h WHERE h.id = :healthId ORDER BY f.createdOn DESC")
 	Page<Food> find(Long healthId, Pageable pageable);
 
-	@Query(value = "SELECT f FROM food f LEFT JOIN meal_food mf ON mf.food_id = f.id AND mf.meal_id = ?1 WHERE f.id IN ?0 AND mf.meal_id IS NULL")
+	@Query(value = "SELECT f FROM food f LEFT JOIN meal_food mf ON mf.food_id = f.id AND mf.meal_id = ?2 WHERE f.id IN ?1 AND mf.meal_id IS NULL", nativeQuery = true)
 	List<Food> findByIdsExcludeMeal(Set<Long> ids, Long mealId);
 
 	@Query("SELECT EXISTS (SELECT f FROM Food f INNER JOIN f.health h WHERE h.id = :healthId AND LOWER(f.title) = LOWER(:title))")
