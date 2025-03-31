@@ -1,6 +1,6 @@
 package org.healthystyle.health.model.sport;
 
-import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +13,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -32,28 +34,29 @@ public class Train {
 	private List<Set> sets;
 	@Temporal(TemporalType.TIME)
 	@Column(nullable = false)
-	private Instant time;
+	private LocalTime time;
 	@Column(nullable = false)
 	private Integer day;
+	@ManyToOne
+	@JoinColumn(name = "sport_id", nullable = false)
 	private Sport sport;
 
 	public Train() {
 		super();
 	}
 
-	public Train(Instant time, Integer day, Set... sets) {
+	public Train(String description, LocalTime time, Integer day, Sport sport) {
 		super();
 
+		Objects.requireNonNull(description, "Description must be not null");
 		Objects.requireNonNull(time, "Time must be not null");
 		Objects.requireNonNull(day, "Day must be not null");
-		Objects.requireNonNull(sets, "Sets must be not null");
-		if (sets.length == 0) {
-			throw new IllegalArgumentException("Must be passed at least one set");
-		}
+		Objects.requireNonNull(sport, "Sport must be not null");
 
-		this.sets = new ArrayList<>(Arrays.asList(sets));
+		this.description = description;
 		this.time = time;
 		this.day = day;
+		this.sport = sport;
 	}
 
 	public Long getId() {
@@ -75,15 +78,19 @@ public class Train {
 		return sets;
 	}
 
-	public void addSets(Set... sets) {
-		getSets().addAll(Arrays.asList(sets));
+	public void addSet(Set set) {
+		getSets().add(set);
 	}
 
-	public Instant getTime() {
+	public void addSets(List<Set> sets) {
+		getSets().addAll(sets);
+	}
+
+	public LocalTime getTime() {
 		return time;
 	}
 
-	public void setTime(Instant time) {
+	public void setTime(LocalTime time) {
 		this.time = time;
 	}
 
@@ -95,4 +102,7 @@ public class Train {
 		this.day = day;
 	}
 
+	public Sport getSport() {
+		return sport;
+	}
 }

@@ -1,5 +1,5 @@
 package org.healthystyle.health.model.measure;
 
 public enum Type {
-	KG, CANTIMETRES, MILLIMETRES, METRES, COUNT
+	KG, GRAM, CANTIMETRES, MILLIMETRES, METRES, COUNT
 }

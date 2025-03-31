@@ -22,7 +22,7 @@ public class Set {
 	private Long id;
 	@ManyToOne
 	@JoinColumn(name = "exercise_id", nullable = false)
-	private Exerсise exercise;
+	private Exercise exercise;
 	@Column(nullable = false)
 	private Integer count;
 	@Column(nullable = false)
@@ -35,7 +35,7 @@ public class Set {
 		super();
 	}
 
-	public Set(Exerсise exercise, Integer count, Integer repeat, Train train) {
+	public Set(Exercise exercise, Integer count, Integer repeat, Train train) {
 		super();
 
 		Objects.requireNonNull(exercise, "Exercise must be not null");
@@ -53,7 +53,7 @@ public class Set {
 		return id;
 	}
 
-	public Exerсise getExercise() {
+	public Exercise getExercise() {
 		return exercise;
 	}
 

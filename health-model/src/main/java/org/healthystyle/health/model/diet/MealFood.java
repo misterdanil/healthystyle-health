@@ -30,13 +30,13 @@ public class MealFood {
 	@JoinColumn(name = "food_id", nullable = false)
 	private Food food;
 	@Column(name = "weight", nullable = false)
-	private String weight;
+	private Float weight;
 	@ManyToOne
 	@JoinColumn(name = "measure_id", nullable = false)
 	private Measure measure;
-	@ManyToOne
-	@JoinColumn(name = "convert_type_id", nullable = false)
-	private ConvertType convertType;
+//	@ManyToOne
+//	@JoinColumn(name = "convert_type_id", nullable = false)
+//	private ConvertType convertType;
 	@Column(name = "created_on", nullable = false)
 	private Instant createdOn;
 
@@ -44,20 +44,20 @@ public class MealFood {
 		super();
 	}
 
-	public MealFood(Meal meal, Food food, String weight, Measure measure, ConvertType convertType) {
+	public MealFood(Meal meal, Food food, Float weight, Measure measure) {
 		super();
 
 		Objects.requireNonNull(meal, "Meal must be not null");
 		Objects.requireNonNull(food, "Food must be not null");
 		Objects.requireNonNull(weight, "Weight must be not null");
 		Objects.requireNonNull(measure, "Measure must be not null");
-		Objects.requireNonNull(convertType, "Convert type must be not null");
+//		Objects.requireNonNull(convertType, "Convert type must be not null");
 
 		this.meal = meal;
 		this.food = food;
 		this.weight = weight;
 		this.measure = measure;
-		this.convertType = convertType;
+//		this.convertType = convertType;
 		this.createdOn = Instant.now();
 	}
 
@@ -73,11 +73,11 @@ public class MealFood {
 		return food;
 	}
 
-	public String getWeight() {
+	public Float getWeight() {
 		return weight;
 	}
 
-	public void setWeight(String weight) {
+	public void setWeight(Float weight) {
 		this.weight = weight;
 	}
 
@@ -89,13 +89,13 @@ public class MealFood {
 		this.measure = measure;
 	}
 
-	public ConvertType getConvertType() {
-		return convertType;
-	}
-
-	public void setConvertType(ConvertType convertType) {
-		this.convertType = convertType;
-	}
+//	public ConvertType getConvertType() {
+//		return convertType;
+//	}
+//
+//	public void setConvertType(ConvertType convertType) {
+//		this.convertType = convertType;
+//	}
 
 	public Instant getCreatedOn() {
 		return createdOn;

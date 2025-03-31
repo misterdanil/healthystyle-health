@@ -24,13 +24,13 @@ public class Step {
 	private String description;
 	@ManyToOne
 	@JoinColumn(name = "exercise_id", nullable = false)
-	private Exerсise exercise;
+	private Exercise exercise;
 
 	public Step() {
 		super();
 	}
 
-	public Step(String description, Exerсise exercise) {
+	public Step(String description, Exercise exercise) {
 		super();
 
 		Objects.requireNonNull(description, "Description must be not null");
@@ -52,7 +52,7 @@ public class Step {
 		this.description = description;
 	}
 
-	public Exerсise getExercise() {
+	public Exercise getExercise() {
 		return exercise;
 	}
 }

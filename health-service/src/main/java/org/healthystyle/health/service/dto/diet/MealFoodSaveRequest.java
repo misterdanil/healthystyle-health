@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.healthystyle.health.model.measure.Type;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class MealFoodSaveRequest {
 	@NotNull(message = "Укажите блюдо")
@@ -14,9 +15,10 @@ public class MealFoodSaveRequest {
 	// food (grams int), liquid (litres float), count int
 	// positive restriction
 	@NotNull(message = "Укажите вес еды")
-	private String weight;
-	@NotNull(message = "Укажите в чём измеряется вес еды")
-	private Type measureType;
+	@Positive(message = "Вес должен быть положительным числом")
+	private Float weight;
+//	@NotNull(message = "Укажите в чём измеряется вес еды")
+//	private Type measureType;
 
 	public Long getMealId() {
 		return mealId;
@@ -34,21 +36,21 @@ public class MealFoodSaveRequest {
 		this.foodId = foodId;
 	}
 
-	public String getWeight() {
+	public Float getWeight() {
 		return weight;
 	}
 
-	public void setWeight(String weight) {
+	public void setWeight(Float weight) {
 		this.weight = weight;
 	}
 
-	public Type getMeasureType() {
-		return measureType;
-	}
-
-	public void setMeasureType(Type measureType) {
-		this.measureType = measureType;
-	}
+//	public Type getMeasureType() {
+//		return measureType;
+//	}
+//
+//	public void setMeasureType(Type measureType) {
+//		this.measureType = measureType;
+//	}
 
 	@Override
 	public int hashCode() {

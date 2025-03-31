@@ -22,7 +22,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(indexes = @Index(name = "exercise_title_idx", columnList = "title"))
-public class Exerсise {
+public class Exercise {
 	@Id
 	@SequenceGenerator(name = "exercise_id", sequenceName = "exercise_seq", initialValue = 1, allocationSize = 5)
 	@GeneratedValue(generator = "exercise_id", strategy = GenerationType.SEQUENCE)
@@ -35,22 +35,22 @@ public class Exerсise {
 	@JoinColumn(name = "health_id", nullable = false)
 	private Health health;
 
-	public Exerсise() {
+	public Exercise() {
 		super();
 	}
 
-	public Exerсise(String title, Health health, Step... steps) {
+	public Exercise(String title, Health health) {
 		super();
 
 		Objects.requireNonNull(title, "Title must be not null");
 		Objects.requireNonNull(health, "Health must be not null");
 		Objects.requireNonNull(steps, "Steps must be not null");
-		if (steps.length == 0) {
-			throw new IllegalArgumentException("Must be passed at least one step");
-		}
+//		if (steps.length == 0) {
+//			throw new IllegalArgumentException("Must be passed at least one step");
+//		}
 
 		this.title = title;
-		this.steps = new ArrayList<>(Arrays.asList(steps));
+//		this.steps = new ArrayList<>(Arrays.asList(steps));
 		this.health = health;
 	}
 
@@ -73,8 +73,12 @@ public class Exerсise {
 		return steps;
 	}
 
-	public void addSteps(Step... steps) {
-		getSteps().addAll(Arrays.asList(steps));
+	public void addStep(Step step) {
+		getSteps().add(step);
+	}
+
+	public void addSteps(List<Step> steps) {
+		getSteps().addAll(steps);
 	}
 
 	public Health getHealth() {

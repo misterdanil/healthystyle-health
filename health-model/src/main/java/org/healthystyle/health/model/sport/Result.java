@@ -1,6 +1,7 @@
 package org.healthystyle.health.model.sport;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -29,24 +30,26 @@ public class Result {
 	@Column(name = "actual_repeat", nullable = false)
 	private Integer actualRepeat;
 	@Column(name = "executed_date", nullable = false)
-	private Instant date;
+	private LocalDate date;
 	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	private Instant createdOn;
+	private Instant createdOn = Instant.now();
 
 	public Result() {
 		super();
 	}
 
-	public Result(Set set, Integer setNumber, Integer actualRepeat) {
+	public Result(Set set, Integer setNumber, Integer actualRepeat, LocalDate date) {
 		super();
 
 		Objects.requireNonNull(set, "Set must be not null");
 		Objects.requireNonNull(setNumber, "Set number must be not null");
 		Objects.requireNonNull(actualRepeat, "Actual repeat must be not null");
+		Objects.requireNonNull(date, "Date must be not null");
 
 		this.set = set;
 		this.setNumber = setNumber;
 		this.actualRepeat = actualRepeat;
+		this.date = date;
 	}
 
 	public Long getId() {
@@ -57,16 +60,20 @@ public class Result {
 		return set;
 	}
 
-	public void setSet(Set set) {
-		this.set = set;
-	}
-
 	public Integer getSetNumber() {
 		return setNumber;
 	}
 
 	public Integer getActualRepeat() {
 		return actualRepeat;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public Instant getCreatedOn() {
+		return createdOn;
 	}
 
 }

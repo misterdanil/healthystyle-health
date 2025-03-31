@@ -59,6 +59,7 @@ public class MealFoodServiceImpl implements MealFoodService {
 	private ConvertTypeService convertTypeService;
 	@Autowired
 	private Validator validator;
+	private final Type DEFAULT_MEASURE_TYPE = Type.GRAM;
 	private static final String[] FIND_BY_MEAL_PARAMS = MethodNameHelper.getMethodParamNames(MealFoodService.class,
 			"findByMeal", Long.class, int.class, int.class);
 
@@ -139,17 +140,16 @@ public class MealFoodServiceImpl implements MealFoodService {
 			throw new MealFoodExistException(mealId, foodId, result);
 		}
 
-		Type measureType = saveRequest.getMeasureType();
-		LOG.debug("Checking measure type '{}' for existing", measureType);
-		Measure measure = measureService.findByType(measureType);
+//		LOG.debug("Checking measure type '{}' for existing", measureType);
+		Measure measure = measureService.findByType(DEFAULT_MEASURE_TYPE);
 
-		String weight = saveRequest.getWeight();
-		LOG.debug("Checking weight '{}' for possible convert type", weight);
-		ConvertType convertType = convertTypeService.getConvertTypeByValue(weight);
+		Float weight = saveRequest.getWeight();
+//		LOG.debug("Checking weight '{}' for possible convert type", weight);
+//		ConvertType convertType = convertTypeService.getConvertTypeByValue(weight);
 
 		LOG.debug("The data is valid: {}", saveRequest);
 
-		MealFood mealFood = new MealFood(meal, food, weight, measure, convertType);
+		MealFood mealFood = new MealFood(meal, food, weight, measure);
 		mealFood = repository.save(mealFood);
 		LOG.info("The meal food '{}' was saved successfully", mealFood);
 
@@ -170,19 +170,23 @@ public class MealFoodServiceImpl implements MealFoodService {
 		LOG.debug("Getting a meal food by id '{}' for update '{}'", id, updateRequest);
 		MealFood mealFood = findById(id);
 
-		Type measureType = updateRequest.getMeasureType();
-		if (measureType != null) {
-			LOG.debug("Checking measure type '{}' for existing", measureType);
-			Measure measure = measureService.findByType(measureType);
-			mealFood.setMeasure(measure);
+//		Type measureType = updateRequest.getMeasureType();
+//		if (measureType != null) {
+//			LOG.debug("Checking measure type '{}' for existing", measureType);
+//			Measure measure = measureService.findByType(measureType);
+//			mealFood.setMeasure(measure);
+//		}
+
+		Float weight = updateRequest.getWeight();
+		if (!weight.equals(mealFood.getWeight())) {
+			mealFood.setWeight(weight);
 		}
 
-		String weight = updateRequest.getWeight();
-		if (weight != null) {
-			LOG.debug("Checking weight '{}' for possible convert type", weight);
-			ConvertType convertType = convertTypeService.getConvertTypeByValue(weight);
-			mealFood.setConvertType(convertType);
-		}
+//		if (weight != null) {
+//			LOG.debug("Checking weight '{}' for possible convert type", weight);
+//			ConvertType convertType = convertTypeService.getConvertTypeByValue(weight);
+//			mealFood.setConvertType(convertType);
+//		}
 
 		LOG.debug("The data '{}' and meal id '{}' are OK", updateRequest, id);
 

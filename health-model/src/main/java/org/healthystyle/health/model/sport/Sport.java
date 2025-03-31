@@ -2,7 +2,7 @@ package org.healthystyle.health.model.sport;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,9 +40,10 @@ public class Sport {
 	private List<Train> trains;
 	@Temporal(TemporalType.DATE)
 	@Column(nullable = false)
-	private Instant start;
+	private LocalDate start;
 	@Temporal(TemporalType.DATE)
-	private Instant end;
+	@Column(nullable = false)
+	private LocalDate end;
 	@ManyToOne
 	@JoinColumn(name = "health_id", nullable = false)
 	private Health health;
@@ -51,20 +52,21 @@ public class Sport {
 		super();
 	}
 
-	public Sport(String description, Instant start, Health health, Train... trains) {
+	public Sport(String description, LocalDate start, LocalDate end, Health health) {
 		super();
 
 		Objects.requireNonNull(description, "Description must be not null");
 		Objects.requireNonNull(start, "Start must be not null");
 		Objects.requireNonNull(end, "End must be not null");
-		Objects.requireNonNull(trains, "Trains must be not null");
-		if (trains.length == 0) {
-			throw new IllegalArgumentException("Must be passed at least one train");
-		}
+//		Objects.requireNonNull(trains, "Trains must be not null");
+//		if (trains.length == 0) {
+//			throw new IllegalArgumentException("Must be passed at least one train");
+//		}
 
 		this.description = description;
-		this.trains = new ArrayList<>(Arrays.asList(trains));
+//		this.trains = new ArrayList<>(Arrays.asList(trains));
 		this.start = start;
+		this.end = end;
 		this.health = health;
 	}
 
@@ -87,23 +89,27 @@ public class Sport {
 		return trains;
 	}
 
-	public void addTrains(Train... trains) {
-		getTrains().addAll(Arrays.asList(trains));
+	public void addTrain(Train train) {
+		getTrains().add(train);
 	}
 
-	public Instant getStart() {
+	public void addTrains(List<Train> trains) {
+		getTrains().addAll(trains);
+	}
+
+	public LocalDate getStart() {
 		return start;
 	}
 
-	public void setStart(Instant start) {
+	public void setStart(LocalDate start) {
 		this.start = start;
 	}
 
-	public Instant getEnd() {
+	public LocalDate getEnd() {
 		return end;
 	}
 
-	public void setEnd(Instant end) {
+	public void setEnd(LocalDate end) {
 		this.end = end;
 	}
 
