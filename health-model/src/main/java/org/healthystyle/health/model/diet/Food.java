@@ -22,7 +22,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(indexes = @Index(name = "food_name_idx", columnList = "name", unique = true))
+@Table(indexes = @Index(name = "food_title_idx", columnList = "title"))
 public class Food {
 	@Id
 	@SequenceGenerator(name = "food_generator", sequenceName = "food_seq", initialValue = 1, allocationSize = 20)

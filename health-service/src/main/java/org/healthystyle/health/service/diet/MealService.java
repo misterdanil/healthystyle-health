@@ -35,7 +35,7 @@ public interface MealService {
 
 	Page<Meal> findPlanned(int page, int limit) throws ValidationException;
 
-	Page<Meal> findNextMeal(int page, int limit) throws ValidationException;
+	List<Meal> findNextMeal(int page, int limit) throws ValidationException;
 
 	Page<Meal> findByDiet(Long dietId, int page, int limit) throws ValidationException;
 

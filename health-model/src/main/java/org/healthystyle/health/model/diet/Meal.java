@@ -31,7 +31,6 @@ public class Meal {
 	@GeneratedValue(generator = "meal_generator", strategy = GenerationType.SEQUENCE)
 	private Long id;
 	@OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "meal_id", nullable = false)
 	private Set<MealFood> foods;
 	@Temporal(TemporalType.TIME)
 	@Column(nullable = false)

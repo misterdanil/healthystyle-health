@@ -1,6 +1,5 @@
 package org.healthystyle.health.model.medicine;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -15,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
-@Entity
+@Entity(name = "MedicineResult")
 @Table(name = "intake_result", indexes = @Index(name = "intake_result_intake_id_idx", columnList = "intake_id"))
 public class Result {
 	@Id

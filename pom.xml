@@ -16,5 +16,6 @@
 		<module>health-repository</module>
 		<module>health-service</module>
 		<module>health-web</module>
+		<module>health-app</module>
 	</modules>
 </project>
