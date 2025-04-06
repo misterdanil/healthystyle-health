@@ -11,8 +11,10 @@ import org.healthystyle.health.model.measure.Measure;
 import org.healthystyle.health.model.measure.Type;
 import org.healthystyle.health.model.measure.convert.ConvertType;
 import org.healthystyle.health.repository.IndicatorTypeRepository;
+import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.IndicatorTypeService;
 import org.healthystyle.health.service.dto.IndicatorTypeSaveRequest;
+import org.healthystyle.health.service.dto.IndicatorTypeSort;
 import org.healthystyle.health.service.dto.IndicatorTypeUpdateRequest;
 import org.healthystyle.health.service.error.ValidationException;
 import org.healthystyle.health.service.error.indicator.IndicatorTypeNotFoundException;
@@ -29,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -46,6 +50,8 @@ public class IndicatorTypeServiceImpl implements IndicatorTypeService {
 	private MeasureService measureService;
 	@Autowired
 	private ConvertTypeService convertTypeService;
+	@Autowired
+	private HealthAccessor healthAccessor;
 
 	private static final Integer MAX_SIZE = 25;
 
@@ -104,7 +110,7 @@ public class IndicatorTypeServiceImpl implements IndicatorTypeService {
 	}
 
 	@Override
-	public Page<IndicatorType> find(int page, int limit) throws ValidationException {
+	public Page<IndicatorType> find(int page, int limit, IndicatorTypeSort sort) throws ValidationException {
 		Map<String, Object> params = Map.ofEntries(entry("page", page), entry("limit", limit));
 		String paramsTemplate = LogTemplate.getParamsTemplate(params);
 
@@ -122,7 +128,12 @@ public class IndicatorTypeServiceImpl implements IndicatorTypeService {
 					result, paramsTemplate, result);
 		}
 
-		Page<IndicatorType> indicatorTypes = repository.find(PageRequest.of(page, limit));
+		Page<IndicatorType> indicatorTypes;
+		if (sort.equals(IndicatorTypeSort.INDICATOR_CREATED_ON)) {
+			indicatorTypes = repository.findSortByIndicatorCreatedOn(PageRequest.of(page, limit));
+		} else {
+			indicatorTypes = repository.find(PageRequest.of(page, limit, Sort.by(Direction.ASC, sort.toString())));
+		}
 		LOG.info("Got indicator types successfully by {}", paramsTemplate);
 
 		return indicatorTypes;

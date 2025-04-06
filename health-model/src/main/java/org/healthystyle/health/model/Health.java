@@ -36,6 +36,10 @@ public class Health {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "health")
 	private List<Sport> sports;
 
+	public Health() {
+		super();
+	}
+
 	public Health(Long userId) {
 		super();
 

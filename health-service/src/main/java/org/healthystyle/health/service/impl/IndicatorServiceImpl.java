@@ -4,7 +4,8 @@ import static java.util.Map.entry;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.IndicatorService;
 import org.healthystyle.health.service.IndicatorTypeService;
 import org.healthystyle.health.service.dto.IndicatorSaveRequest;
+import org.healthystyle.health.service.dto.IndicatorSort;
 import org.healthystyle.health.service.dto.IndicatorUpdateRequest;
 import org.healthystyle.health.service.error.ValidationException;
 import org.healthystyle.health.service.error.indicator.IndicatorNotFoundException;
@@ -33,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -69,7 +73,8 @@ public class IndicatorServiceImpl implements IndicatorService {
 	}
 
 	@Override
-	public Page<Indicator> findByIndicatorType(Long indicatorTypeId, int page, int limit) throws ValidationException {
+	public Page<Indicator> findByIndicatorType(Long indicatorTypeId, int page, int limit, IndicatorSort sort,
+			Direction direction) throws ValidationException {
 		String paramsTemplate = LogTemplate.getParamsTemplate(
 				Map.ofEntries(entry("indicatorTypeId", indicatorTypeId), entry("page", page), entry("limit", limit)));
 
@@ -93,14 +98,15 @@ public class IndicatorServiceImpl implements IndicatorService {
 		Long healthId = healthAccessor.getHealth().getId();
 
 		Page<Indicator> indicators = repository.findByIndicatorType(indicatorTypeId, healthId,
-				PageRequest.of(page, limit));
+				PageRequest.of(page, limit, Sort.by(direction, sort.toString())));
 		LOG.info("Got indicators by params {} successfully", paramsTemplate);
 
 		return indicators;
 	}
 
 	@Override
-	public Page<Indicator> find(int page, int limit) throws ValidationException {
+	public Page<Indicator> find(int page, int limit, IndicatorSort sort, Direction direction)
+			throws ValidationException {
 		String paramsTemplate = LogTemplate
 				.getParamsTemplate(Map.ofEntries(entry("page", page), entry("limit", limit)));
 
@@ -117,15 +123,16 @@ public class IndicatorServiceImpl implements IndicatorService {
 		LOG.debug("Getting health for fetch by params '{}'", paramsTemplate);
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<Indicator> indicators = repository.find(healthId, PageRequest.of(page, limit));
+		Page<Indicator> indicators = repository.find(healthId,
+				PageRequest.of(page, limit, Sort.by(direction, sort.toString())));
 		LOG.info("Got indicators by params {} successfully", paramsTemplate);
 
 		return indicators;
 	}
 
 	@Override
-	public Page<Indicator> findChangesByIndicatorType(Long indicatorTypeId, Instant from, Instant to, int page,
-			int limit) throws ValidationException {
+	public Page<Indicator> findChangesByIndicatorType(Long indicatorTypeId, LocalDateTime from, LocalDateTime to,
+			int page, int limit) throws ValidationException {
 		String paramsTemplate = LogTemplate.getParamsTemplate(Map.ofEntries(entry("indicatorTypeId", indicatorTypeId),
 				entry("from", from), entry("to", to), entry("page", page), entry("limit", limit)));
 
@@ -157,8 +164,8 @@ public class IndicatorServiceImpl implements IndicatorService {
 	}
 
 	@Override
-	public Page<AvgStatistic> findChangesByIndicatorTypeWeeksRange(Long indicatorTypeId, Instant from, Instant to,
-			int page, int limit) throws ValidationException {
+	public Page<AvgStatistic> findChangesByIndicatorTypeWeeksRange(Long indicatorTypeId, LocalDateTime from,
+			LocalDateTime to, int page, int limit) throws ValidationException {
 		String paramsTemplate = LogTemplate.getParamsTemplate(Map.ofEntries(entry("indicatorTypeId", indicatorTypeId),
 				entry("from", from), entry("to", to), entry("page", page), entry("limit", limit)));
 
@@ -190,8 +197,8 @@ public class IndicatorServiceImpl implements IndicatorService {
 	}
 
 	@Override
-	public Page<AvgStatistic> findChangesByIndicatorTypeYearsRange(Long indicatorTypeId, Instant from, Instant to,
-			int page, int limit) throws ValidationException {
+	public Page<AvgStatistic> findChangesByIndicatorTypeYearsRange(Long indicatorTypeId, LocalDateTime from,
+			LocalDateTime to, int page, int limit) throws ValidationException {
 		String paramsTemplate = LogTemplate.getParamsTemplate(Map.ofEntries(entry("indicatorTypeId", indicatorTypeId),
 				entry("from", from), entry("to", to), entry("page", page), entry("limit", limit)));
 
@@ -223,8 +230,8 @@ public class IndicatorServiceImpl implements IndicatorService {
 	}
 
 	@Override
-	public Page<AvgStatistic> findChangedByIndicatorTypeMonthsRange(Long indicatorTypeId, Instant from, Instant to,
-			int page, int limit) throws ValidationException {
+	public Page<AvgStatistic> findChangedByIndicatorTypeMonthsRange(Long indicatorTypeId, LocalDateTime from,
+			LocalDateTime to, int page, int limit) throws ValidationException {
 		String paramsTemplate = LogTemplate.getParamsTemplate(Map.ofEntries(entry("indicatorTypeId", indicatorTypeId),
 				entry("from", from), entry("to", to), entry("page", page), entry("limit", limit)));
 
@@ -330,7 +337,7 @@ public class IndicatorServiceImpl implements IndicatorService {
 			}
 		}
 
-		Instant date = updateRequest.getDate();
+		LocalDateTime date = updateRequest.getDate();
 		if (!date.equals(indicator.getCreatedOn())) {
 			LOG.debug("Date has been changed. Updating: {}", updateRequest);
 			indicator.setCreatedOn(date);

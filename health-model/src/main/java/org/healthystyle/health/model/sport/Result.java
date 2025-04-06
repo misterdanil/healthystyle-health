@@ -31,7 +31,7 @@ public class Result {
 	private Integer actualRepeat;
 	@Column(name = "executed_date", nullable = false)
 	private LocalDate date;
-	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@Column(name = "created_on", nullable = false)
 	private Instant createdOn = Instant.now();
 
 	public Result() {

@@ -12,11 +12,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IndicatorTypeRepository extends JpaRepository<IndicatorType, Long> {
-	@Query("SELECT it FROM IndicatorType it WHERE it.name LIKE '%name%' ORDER BY it.name, it.createdOn DESC")
+	@Query("SELECT it FROM IndicatorType it WHERE LOWER(it.name) LIKE CONCAT(LOWER(:name), '%') ORDER BY it.name, it.createdOn DESC")
 	Page<IndicatorType> findByName(String name, Pageable pageable);
 
-	@Query("SELECT it FROM IndicatorType it ORDER BY it.createdOn DESC")
+	@Query("SELECT it FROM IndicatorType it")
 	Page<IndicatorType> find(Pageable pageable);
+
+	@Query(value = "SELECT it.*, MAX(i.created_on) FROM indicator_type it INNER JOIN indicator i ON i.indicator_type_id = it.id GROUP BY it.id ORDER by MAX(i.created_on) DESC", nativeQuery = true)
+	Page<IndicatorType> findSortByIndicatorCreatedOn(Pageable pageable);
 
 	@Query("SELECT it FROM IndicatorType it INNER JOIN it.measure m WHERE m.type = :type")
 	Page<IndicatorType> findByMeasure(Type type, Pageable pageable);

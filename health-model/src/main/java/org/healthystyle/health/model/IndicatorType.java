@@ -1,20 +1,24 @@
 package org.healthystyle.health.model;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.healthystyle.health.model.measure.Measure;
 import org.healthystyle.health.model.measure.convert.ConvertType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -25,7 +29,7 @@ public class IndicatorType {
 	@SequenceGenerator(name = "indicator_type_generator", sequenceName = "indicator_type_sequence", initialValue = 1, allocationSize = 5)
 	@GeneratedValue(generator = "indicator_type_generator", strategy = GenerationType.SEQUENCE)
 	private Long id;
-	@Column(nullable = false, columnDefinition = "VARCHAR(500) CONSTRAINT CK_indicator_type_name CHECK (name ~ '^\\p{Lu}[\\p{L}\\p{Z}0-9]+$')")
+	@Column(nullable = false, columnDefinition = "VARCHAR(500) CONSTRAINT CK_indicator_type_name CHECK (name ~ '^[А-Я][а-я 0-9]+$')")
 	private String name;
 	@ManyToOne
 	@JoinColumn(name = "measure_id", nullable = false)
@@ -35,7 +39,9 @@ public class IndicatorType {
 	private ConvertType convertType;
 	@Column(nullable = false)
 	private Long creator;
-	@Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@OneToMany(mappedBy = "indicatorType", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<Indicator> indicators;
+	@Column(nullable = false)
 	private Instant createdOn = Instant.now();
 
 	public IndicatorType() {
@@ -86,6 +92,21 @@ public class IndicatorType {
 
 	public Long getCreator() {
 		return creator;
+	}
+
+	public List<Indicator> getIndicators() {
+		if (indicators == null) {
+			indicators = new ArrayList<>();
+		}
+		return indicators;
+	}
+
+	public void addIndicators(List<Indicator> indicators) {
+		getIndicators().addAll(indicators);
+	}
+
+	public void addIndicator(Indicator indicator) {
+		getIndicators().add(indicator);
 	}
 
 	public Instant getCreatedOn() {

@@ -17,6 +17,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 @Entity
 @Table(indexes = @Index(name = "medicine_name_health_id_idx", columnList = "name, health_id", unique = true))
@@ -37,8 +39,9 @@ public class Medicine {
 	@ManyToOne
 	@JoinColumn(name = "health_id", nullable = false)
 	private Health health;
-	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	private Instant createdOn;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "created_on", nullable = false)
+	private Instant createdOn = Instant.now();
 
 	public Medicine() {
 		super();

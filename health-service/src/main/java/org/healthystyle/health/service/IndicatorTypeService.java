@@ -1,8 +1,8 @@
 package org.healthystyle.health.service;
 
 import org.healthystyle.health.model.IndicatorType;
-import org.healthystyle.health.model.measure.Type;
 import org.healthystyle.health.service.dto.IndicatorTypeSaveRequest;
+import org.healthystyle.health.service.dto.IndicatorTypeSort;
 import org.healthystyle.health.service.dto.IndicatorTypeUpdateRequest;
 import org.healthystyle.health.service.error.ValidationException;
 import org.healthystyle.health.service.error.indicator.IndicatorTypeNotFoundException;
@@ -17,7 +17,7 @@ public interface IndicatorTypeService {
 
 	Page<IndicatorType> findByName(String name, int page, int limit) throws ValidationException;
 
-	Page<IndicatorType> find(int page, int limit) throws ValidationException;
+	Page<IndicatorType> find(int page, int limit, IndicatorTypeSort sort) throws ValidationException;
 
 	IndicatorType save(IndicatorTypeSaveRequest saveRequest)
 			throws ValidationException, NameExistedException, MeasureNotFoundException, ConvertTypeNotFoundException;

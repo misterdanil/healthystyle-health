@@ -35,8 +35,8 @@ public class NutritionValue {
 	@ManyToOne
 	@JoinColumn(name = "convert_type_id", nullable = false)
 	private ConvertType convertType;
-	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	private Instant createdOn;
+	@Column(name = "created_on", nullable = false)
+	private Instant createdOn = Instant.now();
 
 	public NutritionValue() {
 		super();

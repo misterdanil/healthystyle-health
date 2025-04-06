@@ -68,4 +68,20 @@ public abstract class AbstractException extends Exception {
 		}
 	}
 
+	public List<String> getGlobalErrors() {
+		return globalErrors;
+	}
+
+	public void setGlobalErrors(List<String> globalErrors) {
+		this.globalErrors = globalErrors;
+	}
+
+	public Map<String, String> getFieldErrors() {
+		return fieldErrors;
+	}
+
+	public void setFieldErrors(Map<String, String> fieldErrors) {
+		this.fieldErrors = fieldErrors;
+	}
+
 }

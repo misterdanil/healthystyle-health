@@ -1,6 +1,6 @@
 package org.healthystyle.health.service.dto;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -11,7 +11,7 @@ public class IndicatorUpdateRequest {
 	@NotNull(message = "Должно быть введено значение")
 	private String value;
 	@PastOrPresent(message = "Дата должна быть текущего или прошлого времени")
-	private Instant date;
+	private LocalDateTime date;
 
 	public Long getId() {
 		return id;
@@ -29,11 +29,11 @@ public class IndicatorUpdateRequest {
 		this.value = value;
 	}
 
-	public Instant getDate() {
+	public LocalDateTime getDate() {
 		return date;
 	}
 
-	public void setDate(Instant date) {
+	public void setDate(LocalDateTime date) {
 		this.date = date;
 	}
 

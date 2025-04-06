@@ -14,6 +14,10 @@ public class FloatNumber extends ConvertType {
 	@Column(nullable = false, columnDefinition = "INT CONSTRAINT CK_min_range CHECK (range >= 1)")
 	private Integer range;
 
+	public FloatNumber() {
+		super();
+	}
+
 	public FloatNumber(Integer range) {
 		super();
 		this.range = range;

@@ -1,6 +1,6 @@
 package org.healthystyle.health.model;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -28,12 +28,16 @@ public class Indicator {
 	@JoinColumn(name = "indicator_type_id", nullable = false)
 	private IndicatorType indicatorType;
 	@Column(name = "created_on", nullable = false)
-	private Instant createdOn;
+	private LocalDateTime createdOn;
 	@ManyToOne
 	@JoinColumn(name = "health_id", nullable = false)
 	private Health health;
 
-	public Indicator(String value, IndicatorType indicatorType, Instant createdOn, Health health) {
+	public Indicator() {
+		super();
+	}
+
+	public Indicator(String value, IndicatorType indicatorType, LocalDateTime createdOn, Health health) {
 		super();
 
 		Objects.requireNonNull(value, "Value must be not null");
@@ -63,11 +67,11 @@ public class Indicator {
 		return indicatorType;
 	}
 
-	public Instant getCreatedOn() {
+	public LocalDateTime getCreatedOn() {
 		return createdOn;
 	}
 
-	public void setCreatedOn(Instant createdOn) {
+	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
 	}
 

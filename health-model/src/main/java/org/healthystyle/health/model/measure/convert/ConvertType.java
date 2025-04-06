@@ -29,7 +29,7 @@ public abstract class ConvertType {
 	@Column(name = "max_value")
 	private BigDecimal maxValue;
 	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	private Instant createdOn;
+	private Instant createdOn = Instant.now();
 
 	public ConvertType() {
 		super();

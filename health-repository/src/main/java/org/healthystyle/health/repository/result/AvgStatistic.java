@@ -1,23 +1,23 @@
 package org.healthystyle.health.repository.result;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class AvgStatistic {
-	private Instant date;
-	private String average;
+	private LocalDateTime createdOn;
+	private String value;
 
-	public AvgStatistic(Instant date, String average) {
+	public AvgStatistic(LocalDateTime createdOn, String value) {
 		super();
-		this.date = date;
-		this.average = average;
+		this.createdOn = createdOn;
+		this.value = value;
 	}
 
-	public Instant getDate() {
-		return date;
+	public LocalDateTime getCreatedOn() {
+		return createdOn;
 	}
 
-	public String getAverage() {
-		return average;
+	public String getValue() {
+		return value;
 	}
 
 }

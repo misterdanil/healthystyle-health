@@ -35,7 +35,7 @@ public class Meal {
 	@Temporal(TemporalType.TIME)
 	@Column(nullable = false)
 	private LocalTime time;
-	@Column(nullable = false, columnDefinition = "SMALLINT CONSTRAINT meal_day_check CHECK (day >= 0 AND day <= 6)")
+	@Column(nullable = false, columnDefinition = "SMALLINT CONSTRAINT CK_meal_day CHECK (day >= 0 AND day <= 6)")
 	private Integer day;
 	@ManyToOne
 	@JoinColumn(name = "diet_id", nullable = false)

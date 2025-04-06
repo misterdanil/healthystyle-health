@@ -1,6 +1,7 @@
 package org.healthystyle.health.service.validation;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 import org.healthystyle.health.model.measure.convert.ConvertType;
 import org.healthystyle.health.model.measure.convert.FloatNumber;
@@ -21,9 +22,9 @@ public class ParamsChecker {
 	public static void checkPageNumber(int pageNumber, BindingResult result) {
 		LOG.debug("Checking page number");
 
-		if (pageNumber < 1) {
-			LOG.warn("Page number is zero or negative: {}", pageNumber);
-			result.reject("*.*.pageNumber.zero_or_negative", "Номер страницы должен быть больше нуля");
+		if (pageNumber < 0) {
+			LOG.warn("Page number is negative: {}", pageNumber);
+			result.reject("*.*.pageNumber.zero_or_negative", "Номер страницы должен быть положительным");
 		}
 	}
 
@@ -42,6 +43,15 @@ public class ParamsChecker {
 	}
 
 	public static void checkDates(Instant fromDate, Instant toDate, BindingResult result) {
+		LOG.debug("Checking from and to dates: {}, {}", fromDate, toDate);
+
+		if (fromDate.isAfter(toDate)) {
+			LOG.warn("From date '{}' is before to date '{}'", fromDate, toDate);
+			result.reject("*.*.date.mixed", "Дата начала должны быть раньше даты конца");
+		}
+	}
+	
+	public static void checkDates(LocalDateTime fromDate, LocalDateTime toDate, BindingResult result) {
 		LOG.debug("Checking from and to dates: {}, {}", fromDate, toDate);
 
 		if (fromDate.isAfter(toDate)) {
