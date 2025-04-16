@@ -9,8 +9,8 @@ import org.healthystyle.health.service.validation.annotation.XORNotNull;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-@XORNotNull(fields = { "foodIds",
-		"foodSetId" }, message = "Должна быть указана либо еда, либо набор еды, но не то и не другое")
+//@XORNotNull(fields = { "foodIds",
+//		"foodSetId" }, message = "Должна быть указана либо еда, либо набор еды, но не то и не другое")
 public class MealSaveRequest {
 	@NotEmpty(message = "Укажите хотя бы одно блюдо")
 	private List<MealFoodSaveRequest> mealFoods;

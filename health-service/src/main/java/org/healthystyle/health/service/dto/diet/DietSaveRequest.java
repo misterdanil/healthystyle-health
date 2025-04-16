@@ -1,6 +1,7 @@
 package org.healthystyle.health.service.dto.diet;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.healthystyle.health.service.validation.annotation.IsAfter;
@@ -15,9 +16,9 @@ public class DietSaveRequest {
 	@NotEmpty(message = "Должен быть указан хотя бы один приём пищи")
 	private List<MealSaveRequest> meals;
 	@NotNull(message = "Укажите дату начала диеты")
-	private Instant start;
+	private LocalDate start;
 	@NotNull(message = "Укажите дату конца диеты")
-	private Instant end;
+	private LocalDate end;
 
 	public String getTitle() {
 		return title;
@@ -35,19 +36,19 @@ public class DietSaveRequest {
 		this.meals = meals;
 	}
 
-	public Instant getStart() {
+	public LocalDate getStart() {
 		return start;
 	}
 
-	public void setStart(Instant start) {
+	public void setStart(LocalDate start) {
 		this.start = start;
 	}
 
-	public Instant getEnd() {
+	public LocalDate getEnd() {
 		return end;
 	}
 
-	public void setEnd(Instant end) {
+	public void setEnd(LocalDate end) {
 		this.end = end;
 	}
 

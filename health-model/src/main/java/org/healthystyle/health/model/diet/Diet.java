@@ -1,8 +1,8 @@
 package org.healthystyle.health.model.diet;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,21 +37,21 @@ public class Diet {
 	private List<Meal> meals;
 	@Temporal(TemporalType.DATE)
 	@Column(nullable = false)
-	private Instant start;
+	private LocalDate start;
 	@Temporal(TemporalType.DATE)
 	@Column(name = "finish", nullable = false)
-	private Instant end;
+	private LocalDate end;
 	@ManyToOne
 	@JoinColumn(name = "health_id", nullable = false)
 	private Health health;
 	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	private Instant createdOn;
+	private Instant createdOn = Instant.now();
 
 	public Diet() {
 		super();
 	}
 
-	public Diet(String title, Instant start, Instant end, Health health) {
+	public Diet(String title, LocalDate start, LocalDate end, Health health) {
 		super();
 
 		Objects.requireNonNull(title, "Title must be not null");
@@ -78,6 +78,9 @@ public class Diet {
 	}
 
 	public List<Meal> getMeals() {
+		if(meals == null) {
+			meals = new ArrayList<>();
+		}
 		return meals;
 	}
 
@@ -89,19 +92,19 @@ public class Diet {
 		getMeals().remove(meal);
 	}
 
-	public Instant getStart() {
+	public LocalDate getStart() {
 		return start;
 	}
 
-	public void setStart(Instant start) {
+	public void setStart(LocalDate start) {
 		this.start = start;
 	}
 
-	public Instant getEnd() {
+	public LocalDate getEnd() {
 		return end;
 	}
 
-	public void setEnd(Instant end) {
+	public void setEnd(LocalDate end) {
 		this.end = end;
 	}
 

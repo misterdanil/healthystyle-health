@@ -37,7 +37,7 @@ public interface MealService {
 
 	List<Meal> findNextMeal(int page, int limit) throws ValidationException;
 
-	Page<Meal> findByDiet(Long dietId, int page, int limit) throws ValidationException;
+	Page<Meal> findByDiet(Long dietId, Integer day, int page, int limit) throws ValidationException;
 
 	Meal save(MealSaveRequest saveRequest, Long dietId) throws ValidationException, MealExistsException,
 			DietNotFoundException, FoodNotFoundException, MealNotFoundException,

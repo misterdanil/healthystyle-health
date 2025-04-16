@@ -3,8 +3,7 @@ package org.healthystyle.health.service.diet.impl;
 import static java.util.Map.entry;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,16 +21,13 @@ import org.healthystyle.health.service.diet.MealService;
 import org.healthystyle.health.service.dto.diet.DietSaveRequest;
 import org.healthystyle.health.service.dto.diet.DietUpdateRequest;
 import org.healthystyle.health.service.dto.diet.MealSaveRequest;
-import org.healthystyle.health.service.dto.diet.MealUpdateRequest;
 import org.healthystyle.health.service.error.ValidationException;
 import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
 import org.healthystyle.health.service.error.diet.DietExistException;
 import org.healthystyle.health.service.error.diet.DietNotFoundException;
 import org.healthystyle.health.service.error.diet.FoodNotFoundException;
-import org.healthystyle.health.service.error.diet.FoodSetNotFoundException;
 import org.healthystyle.health.service.error.diet.MealExistsException;
 import org.healthystyle.health.service.error.diet.MealFoodExistException;
-import org.healthystyle.health.service.error.diet.MealFoodNotFoundException;
 import org.healthystyle.health.service.error.diet.MealNotFoundException;
 import org.healthystyle.health.service.error.diet.MealSaveException;
 import org.healthystyle.health.service.error.diet.MealTimeDuplicateException;
@@ -109,7 +105,7 @@ public class DietServiceImpl implements DietService {
 		LOG.debug("The params are valid: {}", paramsTemplate);
 
 		Health health = healthAccessor.getHealth();
-		Page<Diet> diets = repository.findByTitle(title, health.getId(), PageRequest.of(page, limit));
+		Page<Diet> diets = repository.findByTitle(title, health.getId(), null);
 		LOG.info("Got diets by params {} successfully", paramsTemplate);
 
 		return diets;
@@ -297,12 +293,12 @@ public class DietServiceImpl implements DietService {
 			}
 		}
 
-		Instant start = updateRequest.getStart();
+		LocalDate start = updateRequest.getStart();
 		if (!start.equals(diet.getStart())) {
 			diet.setStart(start);
 		}
 
-		Instant end = updateRequest.getEnd();
+		LocalDate end = updateRequest.getEnd();
 		if (!end.equals(diet.getEnd())) {
 			diet.setEnd(end);
 		}

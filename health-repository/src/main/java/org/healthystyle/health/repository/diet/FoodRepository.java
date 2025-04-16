@@ -15,7 +15,7 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
 	@Query("SELECT f FROM Food f WHERE f.id IN :ids")
 	List<Food> findByIds(Set<Long> ids);
 
-	@Query("SELECT f FROM Food f INNER JOIN f.health h WHERE f.title LIKE '%:title%' AND h.id = :healthId ORDER BY f.createdOn")
+	@Query("SELECT f FROM Food f INNER JOIN f.health h WHERE LOWER(f.title) LIKE CONCAT('%', LOWER(:title), '%') AND h.id = :healthId")
 	Page<Food> findByTitle(String title, Long healthId, Pageable pageable);
 
 	@Query("SELECT f FROM Food f INNER JOIN f.health h WHERE h.id = :healthId ORDER BY f.createdOn DESC")

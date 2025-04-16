@@ -35,13 +35,13 @@ public class Meal {
 	@Temporal(TemporalType.TIME)
 	@Column(nullable = false)
 	private LocalTime time;
-	@Column(nullable = false, columnDefinition = "SMALLINT CONSTRAINT CK_meal_day CHECK (day >= 0 AND day <= 6)")
+	@Column(nullable = false, columnDefinition = "SMALLINT CONSTRAINT CK_meal_day CHECK (day >= 1 AND day <= 7)")
 	private Integer day;
 	@ManyToOne
 	@JoinColumn(name = "diet_id", nullable = false)
 	private Diet diet;
 	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	private Instant createdOn;
+	private Instant createdOn = Instant.now();
 
 	public Meal() {
 		super();
@@ -53,7 +53,6 @@ public class Meal {
 		Objects.requireNonNull(time, "Time must be not null");
 		Objects.requireNonNull(day, "Day must be not null");
 		Objects.requireNonNull(diet, "Diet must be not null");
-		Objects.requireNonNull(foods, "Foods must be not null");
 
 		this.time = time;
 		this.day = day;
@@ -83,6 +82,9 @@ public class Meal {
 	}
 
 	public Set<MealFood> getFoods() {
+		if (foods == null) {
+			foods = new LinkedHashSet<>();
+		}
 		return foods;
 	}
 

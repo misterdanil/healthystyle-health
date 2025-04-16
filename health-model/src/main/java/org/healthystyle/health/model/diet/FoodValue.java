@@ -30,7 +30,7 @@ public class FoodValue {
 	@JoinColumn(name = "food_id", nullable = false)
 	private Food food;
 	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	private Instant createdOn;
+	private Instant createdOn = Instant.now();
 
 	public FoodValue() {
 		super();

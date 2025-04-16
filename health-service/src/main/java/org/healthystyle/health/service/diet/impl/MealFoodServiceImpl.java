@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -117,8 +118,10 @@ public class MealFoodServiceImpl implements MealFoodService {
 	}
 
 	@Override
-	public MealFood save(MealFoodSaveRequest saveRequest) throws ValidationException, MealNotFoundException,
-			MealFoodExistException, FoodNotFoundException, MeasureNotFoundException, ConvertTypeNotRecognizedException {
+	@Transactional
+	public MealFood save(MealFoodSaveRequest saveRequest, Long mealId)
+			throws ValidationException, MealNotFoundException, MealFoodExistException, FoodNotFoundException,
+			MeasureNotFoundException, ConvertTypeNotRecognizedException {
 		LOG.debug("Validating params: {}", saveRequest);
 		BindingResult result = new BeanPropertyBindingResult(saveRequest, "mealFood");
 		validator.validate(saveRequest, result);
@@ -127,7 +130,6 @@ public class MealFoodServiceImpl implements MealFoodService {
 					"Exception occurred while saving a meal food. The data is invalid. Result: %s", result, result);
 		}
 
-		Long mealId = saveRequest.getMealId();
 		LOG.debug("Checking meal id '{}' for existing", mealId);
 		Meal meal = mealService.findById(mealId);
 

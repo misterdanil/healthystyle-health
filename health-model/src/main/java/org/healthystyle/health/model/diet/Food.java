@@ -1,6 +1,7 @@
 package org.healthystyle.health.model.diet;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,7 +44,7 @@ public class Food {
 	@JoinColumn(name = "health_id", nullable = false)
 	private Health health;
 	@Column(name = "created_on", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	private Instant createdOn;
+	private Instant createdOn = Instant.now();
 
 	public Food() {
 		super();
@@ -84,6 +85,9 @@ public class Food {
 	}
 
 	public List<FoodValue> getFoodValues() {
+		if(foodValues == null) {
+			foodValues = new ArrayList<>();
+		}
 		return foodValues;
 	}
 

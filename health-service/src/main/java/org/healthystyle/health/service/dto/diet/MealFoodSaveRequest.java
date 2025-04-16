@@ -8,8 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public class MealFoodSaveRequest {
-	@NotNull(message = "Укажите блюдо")
-	private Long mealId;
 	@NotNull(message = "Укажите еду")
 	private Long foodId;
 	// food (grams int), liquid (litres float), count int
@@ -19,14 +17,6 @@ public class MealFoodSaveRequest {
 	private Float weight;
 //	@NotNull(message = "Укажите в чём измеряется вес еды")
 //	private Type measureType;
-
-	public Long getMealId() {
-		return mealId;
-	}
-
-	public void setMealId(Long mealId) {
-		this.mealId = mealId;
-	}
 
 	public Long getFoodId() {
 		return foodId;
@@ -54,7 +44,7 @@ public class MealFoodSaveRequest {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(foodId, mealId);
+		return Objects.hash(foodId);
 	}
 
 	@Override
@@ -66,7 +56,7 @@ public class MealFoodSaveRequest {
 		if (getClass() != obj.getClass())
 			return false;
 		MealFoodSaveRequest other = (MealFoodSaveRequest) obj;
-		return Objects.equals(foodId, other.foodId) && Objects.equals(mealId, other.mealId);
+		return Objects.equals(foodId, other.foodId);
 	}
 
 }

@@ -15,8 +15,10 @@ import org.healthystyle.health.model.diet.FoodValue;
 import org.healthystyle.health.repository.diet.FoodRepository;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.diet.FoodService;
+import org.healthystyle.health.service.diet.FoodSortTranslator;
 import org.healthystyle.health.service.diet.FoodValueService;
 import org.healthystyle.health.service.dto.diet.FoodSaveRequest;
+import org.healthystyle.health.service.dto.diet.FoodSort;
 import org.healthystyle.health.service.dto.diet.FoodUpdateRequest;
 import org.healthystyle.health.service.dto.diet.FoodValueSaveRequest;
 import org.healthystyle.health.service.error.ValidationException;
@@ -33,7 +35,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -49,13 +54,15 @@ public class FoodServiceImpl implements FoodService {
 	private HealthAccessor healthAccessor;
 	@Autowired
 	private FoodValueService foodValueService;
+	@Autowired
+	private FoodSortTranslator sortTranslator;
 
 	private static final Integer MAX_SIZE = 25;
 
 	private static final String[] findParamNames = MethodNameHelper.getMethodParamNames(FoodService.class, "find",
 			int.class, int.class);
 	private static final String[] findByTitleParamNames = MethodNameHelper.getMethodParamNames(FoodService.class,
-			"findByTitle", String.class, int.class, int.class);
+			"findByTitle", String.class, int.class, int.class, FoodSort.class);
 
 	private static final Logger LOG = LoggerFactory.getLogger(FoodServiceImpl.class);
 
@@ -83,15 +90,15 @@ public class FoodServiceImpl implements FoodService {
 	@Override
 	public List<Food> findByIds(Set<Long> ids) throws ValidationException {
 		LOG.debug("Checking ids for not null: {}", ids);
-		if(ids == null || ids.isEmpty()) {
+		if (ids == null || ids.isEmpty()) {
 			BindingResult result = new MapBindingResult(new HashMap<>(), "food");
 			result.reject("food.find.ids.not_empty", "Укажите идентификаторы еды для поиска");
 			throw new ValidationException("Exception occurred while fetching foods by ids. The ids is null", result);
 		}
-		
+
 		List<Food> foods = repository.findByIds(ids);
 		LOG.debug("Got foods successfully by ids: {}", ids);
-		
+
 		return foods;
 	}
 
@@ -124,8 +131,8 @@ public class FoodServiceImpl implements FoodService {
 	}
 
 	@Override
-	public Page<Food> findByTitle(String title, int page, int limit) throws ValidationException {
-		String params = LogTemplate.getParamsTemplate(findByTitleParamNames, title, page, limit);
+	public Page<Food> findByTitle(String title, int page, int limit, FoodSort sort) throws ValidationException {
+		String params = LogTemplate.getParamsTemplate(findByTitleParamNames, title, page, limit, sort);
 
 		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "food");
 		LOG.debug("Validating params: {}", params);
@@ -148,13 +155,15 @@ public class FoodServiceImpl implements FoodService {
 		LOG.debug("Getting heath for fetching by title: {}", params);
 		Health health = healthAccessor.getHealth();
 
-		Page<Food> foods = repository.findByTitle(title, health.getId(), PageRequest.of(page, limit));
+		Page<Food> foods = repository.findByTitle(title, health.getId(),
+				PageRequest.of(page, limit, Sort.by(Direction.DESC, sortTranslator.translateToSort(sort))));
 		LOG.info("Got foods by params '{}' successfully", params);
 
 		return foods;
 	}
 
 	@Override
+	@Transactional
 	public Food save(FoodSaveRequest saveRequest)
 			throws ValidationException, FoodExistException, NutritionValueNotFoundException, FoodValueExistException,
 			FoodNotFoundException, ConvertTypeMismatchException {

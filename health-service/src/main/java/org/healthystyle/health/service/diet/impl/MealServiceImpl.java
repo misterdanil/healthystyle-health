@@ -4,6 +4,8 @@ import static java.util.Map.entry;
 
 import java.time.Instant;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.Set;
 
 import org.healthystyle.health.model.diet.Diet;
 import org.healthystyle.health.model.diet.Meal;
+import org.healthystyle.health.model.diet.MealFood;
 import org.healthystyle.health.repository.diet.MealRepository;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.diet.DietService;
@@ -42,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -226,7 +230,7 @@ public class MealServiceImpl implements MealService {
 	}
 
 	@Override
-	public Page<Meal> findByDiet(Long dietId, int page, int limit) throws ValidationException {
+	public Page<Meal> findByDiet(Long dietId, Integer day, int page, int limit) throws ValidationException {
 		String params = LogTemplate
 				.getParamsTemplate(Map.ofEntries(entry("dietId", dietId), entry("page", page), entry("limit", limit)));
 
@@ -247,13 +251,14 @@ public class MealServiceImpl implements MealService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<Meal> meals = repository.findByDiet(dietId, healthId, PageRequest.of(page, limit));
+		Page<Meal> meals = repository.findByDiet(dietId, day, healthId, PageRequest.of(page, limit));
 		LOG.info("Got meals by params {} successfully", params);
 
 		return meals;
 	}
 
 	@Override
+	@Transactional
 	public Meal save(MealSaveRequest saveRequest, Long dietId)
 			throws ValidationException, MealExistsException, DietNotFoundException, FoodNotFoundException,
 			MealNotFoundException, MealFoodExistException, MeasureNotFoundException, ConvertTypeNotRecognizedException {
@@ -285,10 +290,14 @@ public class MealServiceImpl implements MealService {
 		LOG.debug("The meal by diet id {}, day {} and time {} was not found");
 
 		Meal meal = new Meal(time, day, diet);
+		meal = repository.save(meal);
+		LOG.info("The meal was saved successfully: {}", meal);
+
 		List<MealFoodSaveRequest> mealFoods = saveRequest.getMealFoods();
 		LOG.debug("Saving meal foods. The meal: {}", saveRequest);
 		for (MealFoodSaveRequest mealFood : mealFoods) {
-			mealFoodService.save(mealFood);
+			MealFood savedMealFood = mealFoodService.save(mealFood, meal.getId());
+			meal.addFood(savedMealFood);
 		}
 
 		LOG.debug("The meal '{}' is valid. Saving: {}", saveRequest, meal);
@@ -341,29 +350,29 @@ public class MealServiceImpl implements MealService {
 
 		Meal meal = findById(mealId);
 
-		Set<MealFoodSaveRequest> mealFoods = updateRequest.getMealFoods();
-		if (mealFoods != null && !mealFoods.isEmpty()) {
-			LOG.debug("Saving meal foods '{}' for meal '{}'", mealFoods, mealId);
-			for (MealFoodSaveRequest mealFood : mealFoods) {
-				LOG.debug("Saving meal food '{}' for meal '{}'", mealFood, mealId);
-				mealFoodService.save(mealFood);
-			}
-		}
+//		Set<MealFoodSaveRequest> mealFoods = updateRequest.getMealFoods();
+//		if (mealFoods != null && !mealFoods.isEmpty()) {
+//			LOG.debug("Saving meal foods '{}' for meal '{}'", mealFoods, mealId);
+//			for (MealFoodSaveRequest mealFood : mealFoods) {
+//				LOG.debug("Saving meal food '{}' for meal '{}'", mealFood, mealId);
+//				mealFoodService.save(mealFood);
+//			}
+//		}
 
-		Set<MealFoodUpdateRequest> updateMealFoods = updateRequest.getUpdateMealFoods();
-		if (updateMealFoods != null && !updateMealFoods.isEmpty()) {
-			LOG.debug("Updating meal foods '{}' for meal '{}'", updateMealFoods, mealId);
-			for (MealFoodUpdateRequest mealFood : updateMealFoods) {
-				LOG.debug("Updating meal food '{}' for meal '{}'", mealFood, mealId);
-				mealFoodService.update(mealFood, mealId);
-			}
-		}
-
-		Set<Long> removeMealFoodIds = updateRequest.getRemoveMealFoodIds();
-		if (removeMealFoodIds != null && !removeMealFoodIds.isEmpty()) {
-			LOG.debug("Deleting meal foods '{}' from meal '{}'", removeMealFoodIds, mealId);
-			mealFoodService.deleteByIds(removeMealFoodIds, meal.getId());
-		}
+//		Set<MealFoodUpdateRequest> updateMealFoods = updateRequest.getUpdateMealFoods();
+//		if (updateMealFoods != null && !updateMealFoods.isEmpty()) {
+//			LOG.debug("Updating meal foods '{}' for meal '{}'", updateMealFoods, mealId);
+//			for (MealFoodUpdateRequest mealFood : updateMealFoods) {
+//				LOG.debug("Updating meal food '{}' for meal '{}'", mealFood, mealId);
+//				mealFoodService.update(mealFood, mealId);
+//			}
+//		}
+//
+//		Set<Long> removeMealFoodIds = updateRequest.getRemoveMealFoodIds();
+//		if (removeMealFoodIds != null && !removeMealFoodIds.isEmpty()) {
+//			LOG.debug("Deleting meal foods '{}' from meal '{}'", removeMealFoodIds, mealId);
+//			mealFoodService.deleteByIds(removeMealFoodIds, meal.getId());
+//		}
 
 		Long dietId = meal.getDiet().getId();
 

@@ -1,10 +1,12 @@
 package org.healthystyle.health.service.diet;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
 import org.healthystyle.health.model.diet.FoodValue;
+import org.healthystyle.health.repository.result.AvgStatistic;
 import org.healthystyle.health.service.dto.diet.FoodValueSaveRequest;
 import org.healthystyle.health.service.dto.diet.FoodValueUpdateRequest;
 import org.healthystyle.health.service.error.ValidationException;
@@ -24,12 +26,12 @@ public interface FoodValueService {
 	static final String[] FIND_SUM_BY_FOODS_AND_NUTRITION_VALUE = MethodNameHelper
 			.getMethodParamNames(FoodValueService.class, "findSumByFoodsAndNutritionValue", List.class, Long.class);
 	static final String[] FIND_AVG_RANGE_WEEK_PARAM_NAMES = MethodNameHelper.getMethodParamNames(FoodValueService.class,
-			"findAvgRangeWeek", Long.class, Long.class, Instant.class, Instant.class, int.class, int.class);
+			"findAvgRangeWeek", Long.class, LocalDate.class, LocalDate.class, int.class, int.class);
 	static final String[] FIND_AVG_RANGE_MONTH_PARAM_NAMES = MethodNameHelper.getMethodParamNames(
-			FoodValueService.class, "findAvgRangeMonth", Long.class, Long.class, Instant.class, Instant.class,
-			int.class, int.class);
+			FoodValueService.class, "findAvgRangeMonth", Long.class, LocalDate.class, LocalDate.class, int.class,
+			int.class);
 	static final String[] FIND_AVG_RANGE_YEAR_PARAM_NAMES = MethodNameHelper.getMethodParamNames(FoodValueService.class,
-			"findAvgRangeYear", Long.class, Long.class, Instant.class, Instant.class, int.class, int.class);
+			"findAvgRangeYear", Long.class, LocalDate.class, LocalDate.class, int.class, int.class);
 
 	FoodValue findById(Long id) throws ValidationException, FoodValueNotFoundException;
 
@@ -40,17 +42,18 @@ public interface FoodValueService {
 
 	Integer findSumByFoodsAndNutritionValue(List<Long> foodIds, Long nutritionValueId) throws ValidationException;
 
-	Page<FoodValue> findAvgRangeWeek(Long nutritionValueId, Instant start, Instant to, int page, int limit)
+	Page<AvgStatistic> findAvgRangeWeek(Long nutritionValueId, LocalDate start, LocalDate to, int page, int limit)
 			throws ValidationException;
 
-	Page<FoodValue> findAvgRangeMonth(Long nutritionValueId, Instant start, Instant to, int page, int limit)
+	Page<AvgStatistic> findAvgRangeMonth(Long nutritionValueId, LocalDate start, LocalDate to, int page, int limit)
 			throws ValidationException;
 
-	Page<FoodValue> findAvgRangeYear(Long nutritionValueId, Instant start, Instant to, int page, int limit)
+	Page<AvgStatistic> findAvgRangeYear(Long nutritionValueId, LocalDate start, LocalDate to, int page, int limit)
 			throws ValidationException;
 
 	FoodValue save(FoodValueSaveRequest saveRequest, Long foodId)
-			throws ValidationException, NutritionValueNotFoundException, FoodValueExistException, FoodNotFoundException, ConvertTypeMismatchException;
+			throws ValidationException, NutritionValueNotFoundException, FoodValueExistException, FoodNotFoundException,
+			ConvertTypeMismatchException;
 
 	void update(FoodValueUpdateRequest updateRequest, Long foodValueId)
 			throws ValidationException, FoodValueNotFoundException, ConvertTypeMismatchException;

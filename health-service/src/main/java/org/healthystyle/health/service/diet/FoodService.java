@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.healthystyle.health.model.diet.Food;
 import org.healthystyle.health.service.dto.diet.FoodSaveRequest;
+import org.healthystyle.health.service.dto.diet.FoodSort;
 import org.healthystyle.health.service.dto.diet.FoodUpdateRequest;
 import org.healthystyle.health.service.error.ValidationException;
 import org.healthystyle.health.service.error.diet.ConvertTypeMismatchException;
@@ -21,7 +22,7 @@ public interface FoodService {
 
 	Page<Food> find(int page, int limit) throws ValidationException;
 
-	Page<Food> findByTitle(String title, int page, int limit) throws ValidationException;
+	Page<Food> findByTitle(String title, int page, int limit, FoodSort sort) throws ValidationException;
 
 	Food save(FoodSaveRequest saveRequest)
 			throws ValidationException, FoodExistException, NutritionValueNotFoundException, FoodValueExistException,

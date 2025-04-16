@@ -21,7 +21,7 @@ public interface MealFoodService {
 
 	Page<MealFood> findByMeal(Long mealId, int page, int limit) throws ValidationException;
 
-	MealFood save(MealFoodSaveRequest saveRequest) throws ValidationException, MealNotFoundException,
+	MealFood save(MealFoodSaveRequest saveRequest, Long mealId) throws ValidationException, MealNotFoundException,
 			FoodNotFoundException, MealFoodExistException, MeasureNotFoundException, ConvertTypeNotRecognizedException;
 
 	void update(MealFoodUpdateRequest updateRequest, Long id) throws ValidationException, MealFoodNotFoundException,

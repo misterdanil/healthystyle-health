@@ -1,6 +1,6 @@
 package org.healthystyle.health.service.validation.annotation.validator;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 import org.healthystyle.health.service.validation.annotation.IsAfter;
 import org.slf4j.Logger;
@@ -35,8 +35,8 @@ public class IsAfterValidator implements ConstraintValidator<IsAfter, Object> {
 
 		LOG.debug("Getting date values");
 		BeanWrapper wrapper = new BeanWrapperImpl(value);
-		Instant beforeDate = (Instant) wrapper.getPropertyValue(beforeField);
-		Instant afterDate = (Instant) wrapper.getPropertyValue(afterField);
+		LocalDate beforeDate = (LocalDate) wrapper.getPropertyValue(beforeField);
+		LocalDate afterDate = (LocalDate) wrapper.getPropertyValue(afterField);
 		if (beforeDate == null || afterDate == null) {
 			LOG.warn("Before field and after field must be not null: {}, {}", beforeDate, afterDate);
 			return false;

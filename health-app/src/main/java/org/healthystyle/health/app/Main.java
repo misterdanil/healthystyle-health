@@ -1,13 +1,13 @@
 package org.healthystyle.health.app;
 
-import org.healthystyle.health.model.Health;
-import org.healthystyle.health.model.IndicatorType;
+import org.healthystyle.health.model.diet.NutritionValue;
+import org.healthystyle.health.model.diet.Value;
 import org.healthystyle.health.model.measure.Measure;
 import org.healthystyle.health.model.measure.Type;
 import org.healthystyle.health.model.measure.convert.ConvertType;
-import org.healthystyle.health.model.measure.convert.FloatNumber;
 import org.healthystyle.health.repository.HealthRepository;
 import org.healthystyle.health.repository.IndicatorTypeRepository;
+import org.healthystyle.health.repository.diet.NutritionValueRepository;
 import org.healthystyle.health.repository.measure.MeasureRepository;
 import org.healthystyle.health.repository.measure.convert.ConvertTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.stereotype.Repository;
 
 @SpringBootApplication(scanBasePackages = "org.healthystyle.health")
 @EnableJpaRepositories(basePackages = "org.healthystyle.health.repository")
@@ -31,6 +30,8 @@ public class Main {
 	private ConvertTypeRepository convertTypeRepository;
 	@Autowired
 	private HealthRepository healthRepository;
+	@Autowired
+	private NutritionValueRepository nutritionValueRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Main.class, args);
@@ -62,6 +63,22 @@ public class Main {
 //			// health
 //			Health health = new Health(1L);
 //			healthRepository.save(health);
+
+			// nutrition values
+//			Measure measureGramm = new Measure(Type.GRAM);
+//			measureGramm = measureRepository.save(measureGramm);
+//			ConvertType ct = convertTypeRepository.findById(1L).get();
+//			NutritionValue nv1 = new NutritionValue(Value.CALORIE, measureGramm, ct);
+//			NutritionValue nv2 = new NutritionValue(Value.FAT, measureGramm, ct);
+//			NutritionValue nv3 = new NutritionValue(Value.CARBOHYDRATE, measureGramm, ct);
+//			NutritionValue nv4 = new NutritionValue(Value.PROTEIN, measureGramm, ct);
+//			NutritionValue nv5 = new NutritionValue(Value.SUGAR, measureGramm, ct);
+//			nutritionValueRepository.save(nv1);
+//			nutritionValueRepository.save(nv2);
+//			nutritionValueRepository.save(nv3);
+//			nutritionValueRepository.save(nv4);
+//			nutritionValueRepository.save(nv5);
+
 		};
 	}
 }

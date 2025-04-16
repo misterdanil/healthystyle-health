@@ -14,8 +14,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DietRepository extends JpaRepository<Diet, Long> {
-	@Query(value = "SELECT d FROM diet d WHERE LOWER(d.title) LIKE '%:title%' AND d.health_id = :healthId ORDER BY (d.start <= CAST(CURRENT_TIMESTAMP AS DATE) AND d.end >= CAST(CURRENT_TIMESTAMP AS DATE)) DESC, d.start", nativeQuery = true)
-	Page<Diet> findByTitle(@Param("title") String title, @Param("healthId") Long healthId, Pageable pageable);
+	@Query(value = "SELECT d.* FROM diet d WHERE LOWER(d.title) LIKE CONCAT('%', LOWER(:title), '%') AND d.health_id = :healthId ORDER BY (d.start <= CAST(CURRENT_TIMESTAMP AS DATE) AND d.finish >= CAST(CURRENT_TIMESTAMP AS DATE)) DESC, d.start", nativeQuery = true)
+	Page<Diet> findByTitle(String title, @Param("healthId") Long healthId, Pageable pageable);
 
 	@Query("SELECT d FROM Diet d INNER JOIN d.health h WHERE d.start >= :start AND d.id = :healthId ORDER BY d.start")
 	Page<Diet> findByStart(Instant start, Long healthId, Pageable pagealbe);

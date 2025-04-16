@@ -1,6 +1,7 @@
 package org.healthystyle.health.service.diet.impl;
 
-import java.time.Instant;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.healthystyle.health.model.diet.NutritionValue;
 import org.healthystyle.health.model.diet.Value;
 import org.healthystyle.health.model.measure.convert.ConvertType;
 import org.healthystyle.health.repository.diet.FoodValueRepository;
+import org.healthystyle.health.repository.result.AvgStatistic;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.diet.FoodService;
 import org.healthystyle.health.service.diet.FoodValueService;
@@ -34,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -167,8 +170,8 @@ public class FoodValueServiceImpl implements FoodValueService {
 	}
 
 	@Override
-	public Page<FoodValue> findAvgRangeWeek(Long nutritionValueId, Instant start, Instant end, int page, int limit)
-			throws ValidationException {
+	public Page<AvgStatistic> findAvgRangeWeek(Long nutritionValueId, LocalDate start, LocalDate end, int page,
+			int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_AVG_RANGE_WEEK_PARAM_NAMES, nutritionValueId, start, end,
 				page, limit);
 
@@ -196,16 +199,17 @@ public class FoodValueServiceImpl implements FoodValueService {
 		LOG.debug("Getting health to get average range weeks food values: {}", params);
 		Health health = healthAccessor.getHealth();
 
-		Page<FoodValue> foodValues = repository.findAvgRangeWeek(nutritionValueId, health.getId(), start, end,
-				PageRequest.of(page, limit));
+		Page<AvgStatistic> foodValues = repository
+				.findAvgRangeWeek(nutritionValueId, health.getId(), start, end, PageRequest.of(page, limit))
+				.map(fv -> new AvgStatistic(((Timestamp) fv[0]).toLocalDateTime(), (String) fv[1]));
 		LOG.info("Got food values by params '{}' successfully", params);
 
 		return foodValues;
 	}
 
 	@Override
-	public Page<FoodValue> findAvgRangeMonth(Long nutritionValueId, Instant start, Instant end, int page, int limit)
-			throws ValidationException {
+	public Page<AvgStatistic> findAvgRangeMonth(Long nutritionValueId, LocalDate start, LocalDate end, int page,
+			int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_AVG_RANGE_MONTH_PARAM_NAMES, nutritionValueId, start, end,
 				page, limit);
 
@@ -233,16 +237,17 @@ public class FoodValueServiceImpl implements FoodValueService {
 		LOG.debug("Getting health to get average range month food values: {}", params);
 		Health health = healthAccessor.getHealth();
 
-		Page<FoodValue> foodValues = repository.findAvgRangeMonth(nutritionValueId, health.getId(), start, end,
-				PageRequest.of(page, limit));
+		Page<AvgStatistic> foodValues = repository
+				.findAvgRangeMonth(nutritionValueId, health.getId(), start, end, PageRequest.of(page, limit))
+				.map(fv -> new AvgStatistic(((Timestamp) fv[0]).toLocalDateTime(), (String) fv[1]));
 		LOG.info("Got food values by params '{}' successfully", params);
 
 		return foodValues;
 	}
 
 	@Override
-	public Page<FoodValue> findAvgRangeYear(Long nutritionValueId, Instant start, Instant end, int page, int limit)
-			throws ValidationException {
+	public Page<AvgStatistic> findAvgRangeYear(Long nutritionValueId, LocalDate start, LocalDate end, int page,
+			int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_AVG_RANGE_YEAR_PARAM_NAMES, nutritionValueId, start, end,
 				page, limit);
 
@@ -270,14 +275,16 @@ public class FoodValueServiceImpl implements FoodValueService {
 		LOG.debug("Getting health to get average range year food values: {}", params);
 		Health health = healthAccessor.getHealth();
 
-		Page<FoodValue> foodValues = repository.findAvgRangeYear(nutritionValueId, health.getId(), start, end,
-				PageRequest.of(page, limit));
+		Page<AvgStatistic> foodValues = repository.findAvgRangeYear(nutritionValueId, health.getId(), start, end,
+				PageRequest.of(page, limit))
+				.map(fv -> new AvgStatistic(((Timestamp) fv[0]).toLocalDateTime(), (String) fv[1]));
 		LOG.info("Got food values by params '{}' successfully", params);
 
 		return foodValues;
 	}
 
 	@Override
+	@Transactional
 	public FoodValue save(FoodValueSaveRequest saveRequest, Long foodId)
 			throws ValidationException, NutritionValueNotFoundException, FoodValueExistException, FoodNotFoundException,
 			ConvertTypeMismatchException {
