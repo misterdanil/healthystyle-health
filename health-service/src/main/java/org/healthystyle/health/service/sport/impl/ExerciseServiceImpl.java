@@ -11,6 +11,7 @@ import org.healthystyle.health.model.sport.Step;
 import org.healthystyle.health.repository.sport.ExerciseRepository;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.dto.sport.ExerciseSaveRequest;
+import org.healthystyle.health.service.dto.sport.ExerciseSort;
 import org.healthystyle.health.service.dto.sport.ExerciseUpdateRequest;
 import org.healthystyle.health.service.dto.sport.StepSaveRequest;
 import org.healthystyle.health.service.error.ValidationException;
@@ -18,6 +19,7 @@ import org.healthystyle.health.service.error.sport.ExerciseExistException;
 import org.healthystyle.health.service.error.sport.ExerciseNotFoundException;
 import org.healthystyle.health.service.log.LogTemplate;
 import org.healthystyle.health.service.sport.ExerciseService;
+import org.healthystyle.health.service.sport.ExerciseSortTranslator;
 import org.healthystyle.health.service.sport.StepService;
 import org.healthystyle.health.service.validation.ParamsChecker;
 import org.slf4j.Logger;
@@ -25,7 +27,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -41,6 +46,8 @@ public class ExerciseServiceImpl implements ExerciseService {
 	private HealthAccessor healthAccessor;
 	@Autowired
 	private StepService stepService;
+	@Autowired
+	private ExerciseSortTranslator sortTranslator;
 
 	private static final Integer MAX_SIZE = 25;
 
@@ -67,12 +74,12 @@ public class ExerciseServiceImpl implements ExerciseService {
 	}
 
 	@Override
-	public Page<Exercise> findByTitle(String title, int page, int limit) throws ValidationException {
-		String params = LogTemplate.getParamsTemplate(FIND_BY_TITLE_PARAM_NAMES, title, page, limit);
+	public Page<Exercise> findByTitle(String title, int page, int limit, ExerciseSort sort) throws ValidationException {
+		String params = LogTemplate.getParamsTemplate(FIND_BY_TITLE_PARAM_NAMES, title, page, limit, sort);
 
 		LOG.debug("Validating params: {}", params);
 		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "exercise");
-		if (title == null || title.isBlank()) {
+		if (title == null) {
 			result.reject("exercise.find.title.not_blank", "Укажите название для поиска");
 		}
 		ParamsChecker.checkPageNumber(page, result);
@@ -83,7 +90,10 @@ public class ExerciseServiceImpl implements ExerciseService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<Exercise> exercises = repository.findByTitle(title, healthId, PageRequest.of(page, limit));
+		LOG.debug("Getting sort translation to fetch exercises by params: {}", params);
+		Sort sortTranslation = sortTranslator.translateToSort(sort);
+
+		Page<Exercise> exercises = repository.findByTitle(title, healthId, PageRequest.of(page, limit, sortTranslation));
 		LOG.info("Got exercises successfully by params '{}'", params);
 
 		return exercises;
@@ -110,7 +120,9 @@ public class ExerciseServiceImpl implements ExerciseService {
 	}
 
 	@Override
-	public Exercise save(ExerciseSaveRequest saveRequest) throws ValidationException, ExerciseExistException, ExerciseNotFoundException {
+	@Transactional
+	public Exercise save(ExerciseSaveRequest saveRequest)
+			throws ValidationException, ExerciseExistException, ExerciseNotFoundException {
 		LOG.debug("Validating exercise: {}", saveRequest);
 		BindingResult result = new BeanPropertyBindingResult(saveRequest, "exercise");
 		validator.validate(saveRequest, result);
@@ -152,10 +164,10 @@ public class ExerciseServiceImpl implements ExerciseService {
 			result.reject("exercise.exists.id.not_null", "Укажите идентификатор для проверки");
 			throw new ValidationException("The id is null", result);
 		}
-		
+
 		boolean exists = repository.existsById(id);
 		LOG.info("Got result '{}' successfully", exists);
-		
+
 		return exists;
 	}
 

@@ -37,4 +37,9 @@ public class SetSaveRequest {
 		this.exerciseId = exerciseId;
 	}
 
+	@Override
+	public String toString() {
+		return "SetSaveRequest [count=" + count + ", repeat=" + repeat + ", exerciseId=" + exerciseId + "]";
+	}
+
 }

@@ -2,7 +2,6 @@ package org.healthystyle.health.model.sport;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -105,4 +104,22 @@ public class Train {
 	public Sport getSport() {
 		return sport;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Train other = (Train) obj;
+		return Objects.equals(id, other.id);
+	}
+
 }

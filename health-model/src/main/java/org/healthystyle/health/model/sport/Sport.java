@@ -117,6 +117,23 @@ public class Sport {
 		return health;
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Sport other = (Sport) obj;
+		return Objects.equals(id, other.id);
+	}
+
 	public static void main(String[] args) throws ParseException {
 		System.out.println(
 				new SimpleDateFormat("dd-MM-yyyy").parse("11-02-2025").toInstant().atZone(ZoneId.of("Europe/Moscow")));

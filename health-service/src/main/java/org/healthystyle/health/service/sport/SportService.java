@@ -1,5 +1,8 @@
 package org.healthystyle.health.service.sport;
 
+
+import java.util.Set;
+
 import org.healthystyle.health.model.sport.Sport;
 import org.healthystyle.health.service.dto.sport.SportSaveRequest;
 import org.healthystyle.health.service.dto.sport.SportUpdateRequest;
@@ -19,7 +22,7 @@ public interface SportService {
 
 	Sport findById(Long id) throws ValidationException, SportNotFoundException;
 
-	Page<Sport> findByDescription(String description, int page, int limit) throws ValidationException;
+	Set<Sport> findByDescription(String description, int page, int limit) throws ValidationException;
 
 	Page<Sport> findActual(int page, int limit) throws ValidationException;
 

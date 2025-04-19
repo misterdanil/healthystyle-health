@@ -1,5 +1,5 @@
 package org.healthystyle.health.web;
 
 public enum Range {
-	WEEK, MONTH, YEAR, NONE;
+	DAY, WEEK, MONTH, YEAR, NONE;
 }

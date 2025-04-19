@@ -53,4 +53,12 @@ public class TrainSaveRequest {
 		this.sets = sets;
 	}
 
+	@Override
+	public String toString() {
+		return "TrainSaveRequest [description=" + description + ", day=" + day + ", time=" + time + ", sets=" + sets
+				+ ", getDescription()=" + getDescription() + ", getDay()=" + getDay() + ", getTime()=" + getTime()
+				+ ", getSets()=" + getSets() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
+				+ ", toString()=" + super.toString() + "]";
+	}
+
 }

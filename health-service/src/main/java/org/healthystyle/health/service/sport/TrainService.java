@@ -2,6 +2,7 @@ package org.healthystyle.health.service.sport;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import org.healthystyle.health.model.sport.Train;
 import org.healthystyle.health.service.dto.sport.TrainSaveRequest;
@@ -24,7 +25,7 @@ public interface TrainService {
 	static final String[] FIND_BY_SPORT_PARAM_NAMES = MethodNameHelper.getMethodParamNames(TrainService.class,
 			"findBySport", Long.class, int.class, int.class);
 	static final String[] FIND_PLANNED_PARAM_NAMES = MethodNameHelper.getMethodParamNames(TrainService.class,
-			"findByPlanned", int.class, int.class);
+			"findPlanned", int.class, int.class);
 
 	Train findById(Long id) throws ValidationException, TrainNotFoundException;
 
@@ -36,7 +37,7 @@ public interface TrainService {
 
 	Page<Train> findBySport(Long sportId, int page, int limit) throws ValidationException;
 
-	Page<Train> findPlanned(int page, int limit) throws ValidationException;
+	Set<Train> findPlanned(int page, int limit) throws ValidationException;
 
 	List<Train> findNextTrain();
 

@@ -1,6 +1,7 @@
 package org.healthystyle.health.service.sport;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 import org.healthystyle.health.model.sport.Result;
 import org.healthystyle.health.repository.result.DateStatistic;
@@ -27,13 +28,13 @@ public interface ResultService {
 	static final String[] FIND_PERCENTAGE_BY_SPORT_PARAM_NAMES = MethodNameHelper
 			.getMethodParamNames(ResultService.class, "findPercentageBySport", Long.class, int.class, int.class);
 	static final String[] FIND_PERCENTAGE_BY_TRAIN_PARAM_NAMES = MethodNameHelper
-			.getMethodParamNames(ResultService.class, "findPercentageByTrain", int.class, int.class);
+			.getMethodParamNames(ResultService.class, "findPercentageByTrain", Long.class, int.class, int.class);
 	static final String[] FIND_PERCENTAGE_BY_DATE_PARAM_NAMES = MethodNameHelper
-			.getMethodParamNames(ResultService.class, "findPercentageByDate", Instant.class, int.class, int.class);
+			.getMethodParamNames(ResultService.class, "findPercentageByDate", LocalDate.class, int.class, int.class);
 	static final String[] FIND_PERCENTAGE_RANGE_WEEKS_PARAM_NAMES = MethodNameHelper.getMethodParamNames(
-			ResultService.class, "findPercentageRangeWeeks", Instant.class, Instant.class, int.class, int.class);
+			ResultService.class, "findPercentageRangeWeeks", LocalDate.class, LocalDate.class, int.class, int.class);
 	static final String[] FIND_PERCENTAGE_RANGE_MONTHS_PARAM_NAMES = MethodNameHelper.getMethodParamNames(
-			ResultService.class, "findPercentageRangeMonths", Instant.class, Instant.class, int.class, int.class);
+			ResultService.class, "findPercentageRangeMonths", LocalDate.class, LocalDate.class, int.class, int.class);
 
 	Result findById(Long id) throws ValidationException, ResultNotFoundException;
 
@@ -51,11 +52,16 @@ public interface ResultService {
 
 	Page<DateStatistic> findPercentageByTrain(Long trainId, int page, int limit) throws ValidationException;
 
-	Page<TimeStatistic> findPercentageByDate(Instant date, int page, int limit) throws ValidationException;
+	Page<TimeStatistic> findPercentageByDate(LocalDate date, int page, int limit) throws ValidationException;
 
-	Page<DateStatistic> findPercentageRangeWeeks(Instant start, Instant end, int page, int limit) throws ValidationException;
+	Page<DateStatistic> findPercentageRangeDays(LocalDate start, LocalDate end, int page, int limit)
+			throws ValidationException;
 
-	Page<DateStatistic> findPercentageRangeMonths(Instant start, Instant end, int page, int limit) throws ValidationException;
+	Page<DateStatistic> findPercentageRangeWeeks(LocalDate start, LocalDate end, int page, int limit)
+			throws ValidationException;
+
+	Page<DateStatistic> findPercentageRangeMonths(LocalDate start, LocalDate end, int page, int limit)
+			throws ValidationException;
 
 	Result save(ResultSaveRequest saveRequest, Long setId)
 			throws ValidationException, ResultExistException, SetNotFoundException;

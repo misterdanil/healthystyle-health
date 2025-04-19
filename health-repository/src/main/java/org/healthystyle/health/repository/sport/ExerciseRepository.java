@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
-	@Query("SELECT e FROM Exercise e INNER JOIN e.health h WHERE e.title LIKE '%:title%' AND h.id = :healthId ORDER BY e.title")
+	@Query("SELECT e FROM Exercise e WHERE LOWER(e.title) LIKE CONCAT('%', LOWER(:title), '%') AND e.health.id = :healthId")
 	Page<Exercise> findByTitle(String title, Long healthId, Pageable pageable);
 
 	@Query("SELECT e FROM Exercise e INNER JOIN e.health h WHERE h.id = :healthId ORDER BY e.createdOn DESC")

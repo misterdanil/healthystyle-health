@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.healthystyle.health.model.Health;
+import org.healthystyle.health.model.sport.Set;
 import org.healthystyle.health.model.sport.Sport;
 import org.healthystyle.health.model.sport.Train;
 import org.healthystyle.health.repository.sport.SportRepository;
@@ -70,13 +71,13 @@ public class SportServiceImpl implements SportService {
 	}
 
 	@Override
-	public Page<Sport> findByDescription(String description, int page, int limit) throws ValidationException {
+	public java.util.Set<Sport> findByDescription(String description, int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_BY_DESCRIPTION_PARAM_NAMES, description, page, limit);
 
 		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "sport");
 		LOG.debug("Validating params: {}", params);
-		if (description == null || description.isBlank()) {
-			result.reject("sport.find.description.not_empty", "Укажите описание для поиска");
+		if (description == null) {
+			result.reject("sport.find.description.not_null", "Укажите описание для поиска");
 		}
 		ParamsChecker.checkPageNumber(page, result);
 		ParamsChecker.checkLimit(limit, MAX_SIZE, result);
@@ -88,7 +89,7 @@ public class SportServiceImpl implements SportService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<Sport> sports = repository.findByDescription(description, healthId, PageRequest.of(page, limit));
+		java.util.Set<Sport> sports = repository.findByDescription(description, healthId, page, limit);
 		LOG.info("Got sports successfully by params: {}", params);
 
 		return sports;

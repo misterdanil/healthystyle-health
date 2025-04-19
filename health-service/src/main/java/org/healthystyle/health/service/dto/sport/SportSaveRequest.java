@@ -55,4 +55,10 @@ public class SportSaveRequest {
 		this.trains = trains;
 	}
 
+	@Override
+	public String toString() {
+		return "SportSaveRequest [description=" + description + ", start=" + start + ", end=" + end + ", trains="
+				+ trains + "]";
+	}
+
 }

@@ -47,7 +47,7 @@ public class Exercise {
 
 		Objects.requireNonNull(title, "Title must be not null");
 		Objects.requireNonNull(health, "Health must be not null");
-		Objects.requireNonNull(steps, "Steps must be not null");
+//		Objects.requireNonNull(steps, "Steps must be not null");
 //		if (steps.length == 0) {
 //			throw new IllegalArgumentException("Must be passed at least one step");
 //		}

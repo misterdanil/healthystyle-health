@@ -1,5 +1,7 @@
 package org.healthystyle.health.service.sport.impl;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -223,7 +225,7 @@ public class ResultServiceImpl implements ResultService {
 	}
 
 	@Override
-	public Page<TimeStatistic> findPercentageByDate(Instant date, int page, int limit) throws ValidationException {
+	public Page<TimeStatistic> findPercentageByDate(LocalDate date, int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_PERCENTAGE_BY_DATE_PARAM_NAMES, date, page, limit);
 
 		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "result");
@@ -240,14 +242,15 @@ public class ResultServiceImpl implements ResultService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<TimeStatistic> results = repository.findPercentageByDate(date, healthId, PageRequest.of(page, limit));
+		Page<TimeStatistic> results = repository.findPercentageByDate(date, healthId, PageRequest.of(page, limit))
+				.map(o -> new TimeStatistic(((Time) o[0]).toLocalTime(), Float.valueOf((String) o[1])));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;
 	}
 
 	@Override
-	public Page<DateStatistic> findPercentageRangeWeeks(Instant start, Instant end, int page, int limit)
+	public Page<DateStatistic> findPercentageRangeDays(LocalDate start, LocalDate end, int page, int limit)
 			throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_PERCENTAGE_RANGE_WEEKS_PARAM_NAMES, start, end, page, limit);
 
@@ -268,14 +271,44 @@ public class ResultServiceImpl implements ResultService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<DateStatistic> results = repository.findPercentageRangeWeeks(start, end, healthId, PageRequest.of(page, limit));
+		Page<DateStatistic> results = repository.findPercentageRangeDays(start, end, healthId,
+				PageRequest.of(page, limit)).map(o -> new DateStatistic(((Timestamp)o[0]).toLocalDateTime().toLocalDate(), o[1] != null ? Float.valueOf((String)o[1]) : null));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;
 	}
 
 	@Override
-	public Page<DateStatistic> findPercentageRangeMonths(Instant start, Instant end, int page, int limit)
+	public Page<DateStatistic> findPercentageRangeWeeks(LocalDate start, LocalDate end, int page, int limit)
+			throws ValidationException {
+		String params = LogTemplate.getParamsTemplate(FIND_PERCENTAGE_RANGE_WEEKS_PARAM_NAMES, start, end, page, limit);
+
+		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "result");
+		if (start == null) {
+			result.reject("result.find.start.not_null", "Укажите дату начала для поиска");
+		}
+		if (end == null) {
+			result.reject("result.find.end.not_null", "Укажите дату конца для поиска");
+		}
+		ParamsChecker.checkPageNumber(page, result);
+		ParamsChecker.checkLimit(limit, MAX_SIZE, result);
+		if (result.hasErrors()) {
+			throw new ValidationException("The params are invalid: %s. Result: %s", result, params, result);
+		}
+
+		LOG.debug("The params are OK: {}", params);
+
+		Long healthId = healthAccessor.getHealth().getId();
+
+		Page<DateStatistic> results = repository.findPercentageRangeWeeks(start, end, healthId,
+				PageRequest.of(page, limit));
+		LOG.info("Got results successfully by params: {}", params);
+
+		return results;
+	}
+
+	@Override
+	public Page<DateStatistic> findPercentageRangeMonths(LocalDate start, LocalDate end, int page, int limit)
 			throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_PERCENTAGE_RANGE_MONTHS_PARAM_NAMES, start, end, page,
 				limit);
@@ -297,7 +330,8 @@ public class ResultServiceImpl implements ResultService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<DateStatistic> results = repository.findPercentageRangeMonths(start, end, healthId, PageRequest.of(page, limit));
+		Page<DateStatistic> results = repository.findPercentageRangeMonths(start, end, healthId,
+				PageRequest.of(page, limit));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;

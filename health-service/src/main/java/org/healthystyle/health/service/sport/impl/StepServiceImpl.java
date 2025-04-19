@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -82,6 +83,7 @@ public class StepServiceImpl implements StepService {
 	}
 
 	@Override
+	@Transactional
 	public Step save(StepSaveRequest saveRequest, Long exerciseId)
 			throws ValidationException, ExerciseNotFoundException {
 		LOG.debug("Validating step: {}", saveRequest);

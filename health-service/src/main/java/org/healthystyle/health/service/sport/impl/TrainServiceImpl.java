@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.healthystyle.health.model.sport.Sport;
 import org.healthystyle.health.model.sport.Train;
@@ -164,7 +165,7 @@ public class TrainServiceImpl implements TrainService {
 	}
 
 	@Override
-	public Page<Train> findPlanned(int page, int limit) throws ValidationException {
+	public Set<Train> findPlanned(int page, int limit) throws ValidationException {
 		String params = LogTemplate.getParamsTemplate(FIND_PLANNED_PARAM_NAMES, page, limit);
 
 		LOG.debug("Validating params: {}", params);
@@ -177,7 +178,7 @@ public class TrainServiceImpl implements TrainService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<Train> trains = repository.findPlanned(healthId, PageRequest.of(page, limit));
+		Set<Train> trains = repository.findPlanned(healthId, page, limit);
 		LOG.info("Got trains successfully by params: {}", params);
 
 		return trains;
