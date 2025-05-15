@@ -1,16 +1,16 @@
 package org.healthystyle.health.service.error.medicine;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 import org.healthystyle.health.service.error.AbstractException;
 import org.springframework.validation.BindingResult;
 
 public class PlanOverlapsException extends AbstractException {
-	private Instant start;
-	private Instant end;
+	private LocalDate start;
+	private LocalDate end;
 	private Long medicineId;
 
-	public PlanOverlapsException(Instant start, Instant end, Long medicineId, BindingResult result) {
+	public PlanOverlapsException(LocalDate start, LocalDate end, Long medicineId, BindingResult result) {
 		super(result, "There is already plan with medicine intakes '%s' from start '%s' to end '%s'", medicineId, start,
 				end);
 		this.start = start;
@@ -18,11 +18,11 @@ public class PlanOverlapsException extends AbstractException {
 		this.medicineId = medicineId;
 	}
 
-	public Instant getStart() {
+	public LocalDate getStart() {
 		return start;
 	}
 
-	public Instant getEnd() {
+	public LocalDate getEnd() {
 		return end;
 	}
 

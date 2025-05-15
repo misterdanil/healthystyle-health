@@ -40,6 +40,10 @@ public class Treatment {
 	@Column(nullable = false)
 	private Instant createdOn;
 
+	public Treatment() {
+		super();
+	}
+
 	public Treatment(String description, Health health) {
 		super();
 

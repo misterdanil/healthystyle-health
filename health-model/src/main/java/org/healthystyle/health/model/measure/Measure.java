@@ -47,4 +47,9 @@ public class Measure {
 		this.type = type;
 	}
 
+	@Override
+	public String toString() {
+		return "Measure [id=" + id + ", type=" + type + "]";
+	}
+
 }

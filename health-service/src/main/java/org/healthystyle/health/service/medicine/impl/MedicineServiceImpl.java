@@ -75,7 +75,7 @@ public class MedicineServiceImpl implements MedicineService {
 
 	@Override
 	public Page<Medicine> findByName(String name, int page, int limit) throws ValidationException {
-		String params = LogTemplate.getParamsTemplate(FIND_BY_NAME_PARAM_NAMES, page, limit);
+		String params = LogTemplate.getParamsTemplate(FIND_BY_NAME_PARAM_NAMES, name, page, limit);
 
 		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "medicine");
 		LOG.debug("Validating params: {}", params);
@@ -157,6 +157,8 @@ public class MedicineServiceImpl implements MedicineService {
 		Medicine medicine = new Medicine(name, health);
 
 		if (weight != null) {
+			medicine.setWeight(weight);
+			
 			LOG.debug("Recognizing a convert type for weight: {}", saveRequest);
 			ConvertType convertType = ParamsChecker.checkConvertType(weight, convertTypeService, result);
 			medicine.setConvertType(convertType);

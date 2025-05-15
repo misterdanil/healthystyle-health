@@ -1,6 +1,7 @@
 package org.healthystyle.health.repository.medicine;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 import org.healthystyle.health.model.medicine.Plan;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
 	Page<Plan> findByTreatment(Long treatmentId, Long healthId, Pageable pageable);
 
 	@Query("SELECT EXISTS (SELECT p FROM Plan p INNER JOIN p.medicine m WHERE m.id = :medicineId AND p.start <= :end AND p.end >= :start AND (:planId IS NULL OR p.id != :planId))")
-	boolean existsOverlaps(Instant start, Instant end, Long medicineId, Long planId);
+	boolean existsOverlaps(LocalDate start, LocalDate end, Long medicineId, Long planId);
 
 }

@@ -243,7 +243,8 @@ public class ResultServiceImpl implements ResultService {
 		Long healthId = healthAccessor.getHealth().getId();
 
 		Page<TimeStatistic> results = repository.findPercentageByDate(date, healthId, PageRequest.of(page, limit))
-				.map(o -> new TimeStatistic(((Time) o[0]).toLocalTime(), Float.valueOf((String) o[1])));
+				.map(o -> new TimeStatistic(((Time) o[0]).toLocalTime(),
+						o[1] != null ? Float.valueOf((String) o[1]) : null));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;
@@ -271,8 +272,10 @@ public class ResultServiceImpl implements ResultService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<DateStatistic> results = repository.findPercentageRangeDays(start, end, healthId,
-				PageRequest.of(page, limit)).map(o -> new DateStatistic(((Timestamp)o[0]).toLocalDateTime().toLocalDate(), o[1] != null ? Float.valueOf((String)o[1]) : null));
+		Page<DateStatistic> results = repository
+				.findPercentageRangeDays(start, end, healthId, PageRequest.of(page, limit))
+				.map(o -> new DateStatistic(((Timestamp) o[0]).toLocalDateTime().toLocalDate(),
+						o[1] != null ? Float.valueOf((String) o[1]) : null));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;
@@ -300,8 +303,10 @@ public class ResultServiceImpl implements ResultService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<DateStatistic> results = repository.findPercentageRangeWeeks(start, end, healthId,
-				PageRequest.of(page, limit));
+		Page<DateStatistic> results = repository
+				.findPercentageRangeWeeks(start, end, healthId, PageRequest.of(page, limit))
+				.map(o -> new DateStatistic(((Timestamp) o[0]).toLocalDateTime().toLocalDate(),
+						o[1] != null ? Float.valueOf((String) o[1]) : null));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;
@@ -330,8 +335,10 @@ public class ResultServiceImpl implements ResultService {
 
 		Long healthId = healthAccessor.getHealth().getId();
 
-		Page<DateStatistic> results = repository.findPercentageRangeMonths(start, end, healthId,
-				PageRequest.of(page, limit));
+		Page<DateStatistic> results = repository
+				.findPercentageRangeMonths(start, end, healthId, PageRequest.of(page, limit))
+				.map(o -> new DateStatistic(((Timestamp) o[0]).toLocalDateTime().toLocalDate(),
+						o[1] != null ? Float.valueOf((String) o[1]) : null));
 		LOG.info("Got results successfully by params: {}", params);
 
 		return results;

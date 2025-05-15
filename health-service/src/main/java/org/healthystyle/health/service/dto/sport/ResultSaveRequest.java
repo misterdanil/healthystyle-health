@@ -14,7 +14,7 @@ public class ResultSaveRequest {
 	@Positive(message = "Количество повтоений должено быть положительным")
 	private Integer actualRepeat;
 	@NotNull(message = "Укажите дату")
-	@PastOrPresent(message = "Дата должна быть текущей или прошлой")
+//	@PastOrPresent(message = "Дата должна быть текущей или прошлой")
 	private LocalDate date;
 
 	public Integer getSetNumber() {

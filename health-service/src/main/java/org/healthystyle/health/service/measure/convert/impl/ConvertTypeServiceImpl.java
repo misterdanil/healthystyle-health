@@ -51,6 +51,7 @@ public class ConvertTypeServiceImpl implements ConvertTypeService {
 		LOG.debug("Checking value for integer: {}", value);
 		try {
 			Integer.valueOf(value);
+			return repository.findInteger();
 		} catch (NumberFormatException e) {
 			LOG.debug("Not integer: {}", value);
 		}
@@ -67,7 +68,7 @@ public class ConvertTypeServiceImpl implements ConvertTypeService {
 		} catch (NumberFormatException e) {
 			LOG.debug("Not float: {}", value);
 		}
-		
+
 		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "convertType");
 		result.reject("convert_type.find.value.not_recognized", "Неизвестный тип данных");
 		throw new ConvertTypeNotRecognizedException(result, value);

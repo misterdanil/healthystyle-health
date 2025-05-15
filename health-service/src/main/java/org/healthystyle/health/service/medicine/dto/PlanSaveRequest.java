@@ -1,9 +1,8 @@
 package org.healthystyle.health.service.medicine.dto;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
-import org.healthystyle.health.model.measure.Type;
 import org.healthystyle.health.model.medicine.Sequence;
 import org.healthystyle.health.service.validation.annotation.IsAfter;
 
@@ -20,9 +19,9 @@ public class PlanSaveRequest {
 //	private Type measure;
 	private Sequence sequence;
 	@NotNull(message = "Укажите дату начала приёма лекарства")
-	private Instant start;
+	private LocalDate start;
 	@NotNull(message = "Укажите дату конца приёма лекарства")
-	private Instant end;
+	private LocalDate end;
 
 	public Long getMedicineId() {
 		return medicineId;
@@ -64,19 +63,19 @@ public class PlanSaveRequest {
 		this.sequence = sequence;
 	}
 
-	public Instant getStart() {
+	public LocalDate getStart() {
 		return start;
 	}
 
-	public void setStart(Instant start) {
+	public void setStart(LocalDate start) {
 		this.start = start;
 	}
 
-	public Instant getEnd() {
+	public LocalDate getEnd() {
 		return end;
 	}
 
-	public void setEnd(Instant end) {
+	public void setEnd(LocalDate end) {
 		this.end = end;
 	}
 

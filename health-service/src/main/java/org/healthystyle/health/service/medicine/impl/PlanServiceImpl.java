@@ -1,6 +1,6 @@
 package org.healthystyle.health.service.medicine.impl;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -218,8 +218,8 @@ public class PlanServiceImpl implements PlanService {
 		Medicine medicine = medicineService.findById(medicineId);
 
 		LOG.debug("Checking dates overlaps by medicine, start and end: {}", saveRequest);
-		Instant start = saveRequest.getStart();
-		Instant end = saveRequest.getEnd();
+		LocalDate start = saveRequest.getStart();
+		LocalDate end = saveRequest.getEnd();
 		if (repository.existsOverlaps(start, end, medicineId, null)) {
 			result.reject("plan.save.overlaps",
 					"Уже существует план приёма лекарства, который пересекается с этими датами");
@@ -229,7 +229,7 @@ public class PlanServiceImpl implements PlanService {
 		LOG.debug("Getting health to save plan: {}", saveRequest);
 		Health health = healthAccessor.getHealth();
 
-		Plan plan = new Plan(medicine, saveRequest.getStart(), saveRequest.getEnd(), treatment, health);
+		Plan plan = new Plan(medicine, start, end, treatment, health);
 		plan = repository.save(plan);
 		Long planId = plan.getId();
 
@@ -290,8 +290,8 @@ public class PlanServiceImpl implements PlanService {
 		LOG.debug("Checking plan for existence by id '{}'", id);
 		Plan plan = findById(id);
 
-		Instant start = updateRequest.getStart();
-		Instant end = updateRequest.getEnd();
+		LocalDate start = updateRequest.getStart();
+		LocalDate end = updateRequest.getEnd();
 		if (!start.equals(plan.getStart()) || !end.equals(plan.getEnd())) {
 			LOG.debug("Checking date overlaps for plan '{}': {}", id, updateRequest);
 			Long medicineId = plan.getMedicine().getId();

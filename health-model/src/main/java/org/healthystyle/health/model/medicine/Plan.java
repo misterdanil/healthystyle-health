@@ -1,13 +1,11 @@
 package org.healthystyle.health.model.medicine;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import org.healthystyle.health.model.Health;
-import org.healthystyle.health.model.measure.Measure;
-import org.healthystyle.health.model.measure.convert.ConvertType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -46,10 +44,10 @@ public class Plan {
 	private Sequence sequence;
 	@Temporal(TemporalType.DATE)
 	@Column(nullable = false)
-	private Instant start;
+	private LocalDate start;
 	@Temporal(TemporalType.DATE)
 	@Column(name = "finish", nullable = false)
-	private Instant end;
+	private LocalDate end;
 	@ManyToOne
 	@JoinColumn(name = "treatment_id", nullable = false)
 	private Treatment treatment;
@@ -61,7 +59,7 @@ public class Plan {
 		super();
 	}
 
-	public Plan(Medicine medicine, Instant start, Instant end, Treatment treatment, Health health) {
+	public Plan(Medicine medicine, LocalDate start, LocalDate end, Treatment treatment, Health health) {
 		super();
 
 		Objects.requireNonNull(medicine, "Medicine must be not null");
@@ -136,19 +134,19 @@ public class Plan {
 		this.sequence = sequence;
 	}
 
-	public Instant getStart() {
+	public LocalDate getStart() {
 		return start;
 	}
 
-	public void setStart(Instant start) {
+	public void setStart(LocalDate start) {
 		this.start = start;
 	}
 
-	public Instant getEnd() {
+	public LocalDate getEnd() {
 		return end;
 	}
 
-	public void setEnd(Instant end) {
+	public void setEnd(LocalDate end) {
 		this.end = end;
 	}
 

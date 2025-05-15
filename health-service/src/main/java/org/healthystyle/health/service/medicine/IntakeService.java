@@ -47,6 +47,9 @@ public interface IntakeService {
 	List<Intake> findPlanned(int page, int limit) throws ValidationException;
 
 	List<Intake> findNextIntake(int page, int limit) throws ValidationException;
+	
+	List<Intake> findNotExecuted(int page, int limit) throws ValidationException;
+
 
 	Intake save(IntakeSaveRequest saveRequest, Long planId)
 			throws ValidationException, PlanNotFoundException, IntakeExistException, WeightNegativeOrZeroException,

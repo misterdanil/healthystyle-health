@@ -15,6 +15,7 @@ import org.healthystyle.health.model.measure.convert.ConvertType;
 import org.healthystyle.health.model.medicine.Intake;
 import org.healthystyle.health.model.medicine.Plan;
 import org.healthystyle.health.repository.medicine.IntakeRepository;
+import org.healthystyle.health.repository.medicine.IntakeRepository.MissedDateIntake;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.error.ValidationException;
 import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
@@ -320,6 +321,14 @@ public class IntakeServiceImpl implements IntakeService {
 		LOG.info("Intake was saved successfully: {}", intake);
 
 		return intake;
+	}
+
+	@Override
+	public List<Intake> findNotExecuted(int page, int limit) throws ValidationException {
+		Health health = healthAccessor.getHealth();
+
+		List<MissedDateIntake> missed = repository.findNotExecuted(health.getId(), page, limit);
+		return null;
 	}
 
 	@Override

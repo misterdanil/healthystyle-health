@@ -96,4 +96,8 @@ public class Medicine {
 	public Health getHealth() {
 		return health;
 	}
+
+	public Instant getCreatedOn() {
+		return createdOn;
+	}
 }

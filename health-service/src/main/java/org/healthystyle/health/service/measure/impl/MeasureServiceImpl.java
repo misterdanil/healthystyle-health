@@ -1,6 +1,7 @@
 package org.healthystyle.health.service.measure.impl;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.healthystyle.health.model.measure.Measure;
@@ -42,6 +43,11 @@ public class MeasureServiceImpl implements MeasureService {
 		LOG.info("Got measure by type '{}' successfully", type);
 
 		return measure;
+	}
+
+	@Override
+	public List<Measure> findAll() {
+		return repository.findAll();
 	}
 
 }

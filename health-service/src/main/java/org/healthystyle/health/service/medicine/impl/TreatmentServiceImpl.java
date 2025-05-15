@@ -2,17 +2,27 @@ package org.healthystyle.health.service.medicine.impl;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.healthystyle.health.model.Health;
+import org.healthystyle.health.model.medicine.Plan;
 import org.healthystyle.health.model.medicine.Treatment;
 import org.healthystyle.health.repository.medicine.TreatmentRepository;
 import org.healthystyle.health.service.HealthAccessor;
 import org.healthystyle.health.service.error.ValidationException;
+import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
+import org.healthystyle.health.service.error.measure.MeasureNotFoundException;
+import org.healthystyle.health.service.error.medicine.IntakeExistException;
+import org.healthystyle.health.service.error.medicine.MedicineNotFoundException;
+import org.healthystyle.health.service.error.medicine.PlanOverlapsException;
 import org.healthystyle.health.service.error.medicine.TreatmentExistException;
 import org.healthystyle.health.service.error.medicine.TreatmentNotFoundException;
+import org.healthystyle.health.service.error.medicine.WeightNegativeOrZeroException;
 import org.healthystyle.health.service.log.LogTemplate;
+import org.healthystyle.health.service.medicine.PlanService;
 import org.healthystyle.health.service.medicine.TreatmentService;
+import org.healthystyle.health.service.medicine.dto.PlanSaveRequest;
 import org.healthystyle.health.service.medicine.dto.TreatmentSaveRequest;
 import org.healthystyle.health.service.medicine.dto.TreatmentUpdateRequest;
 import org.healthystyle.health.service.validation.ParamsChecker;
@@ -22,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -35,6 +46,8 @@ public class TreatmentServiceImpl implements TreatmentService {
 	private Validator validator;
 	@Autowired
 	private HealthAccessor healthAccessor;
+	@Autowired
+	private PlanService planService;
 
 	private static final Integer MAX_SIZE = 25;
 
@@ -116,7 +129,10 @@ public class TreatmentServiceImpl implements TreatmentService {
 	}
 
 	@Override
-	public Treatment save(TreatmentSaveRequest saveRequest) throws ValidationException, TreatmentExistException {
+	@Transactional(rollbackFor = Exception.class)
+	public Treatment save(TreatmentSaveRequest saveRequest) throws ValidationException, TreatmentExistException,
+			TreatmentNotFoundException, MedicineNotFoundException, PlanOverlapsException, IntakeExistException,
+			WeightNegativeOrZeroException, ConvertTypeNotRecognizedException, MeasureNotFoundException {
 		LOG.debug("Validating treatments: {}", saveRequest);
 		BindingResult result = new BeanPropertyBindingResult(saveRequest, "treatment");
 		validator.validate(saveRequest, result);
@@ -142,11 +158,18 @@ public class TreatmentServiceImpl implements TreatmentService {
 		treatment = repository.save(treatment);
 		LOG.info("Treatment was saved successfully: {}", treatment);
 
+		List<PlanSaveRequest> planSaveRequests = saveRequest.getPlans();
+		for (PlanSaveRequest planSaveRequest : planSaveRequests) {
+			Plan plan = planService.save(planSaveRequest, treatment.getId());
+			treatment.addPlans(plan);
+		}
+
 		return treatment;
 	}
 
 	@Override
-	public void update(TreatmentUpdateRequest updateRequest, Long id) throws ValidationException, TreatmentNotFoundException, TreatmentExistException {
+	public void update(TreatmentUpdateRequest updateRequest, Long id)
+			throws ValidationException, TreatmentNotFoundException, TreatmentExistException {
 		LOG.debug("Validating treatments: {}", updateRequest);
 		BindingResult result = new BeanPropertyBindingResult(updateRequest, "treatment");
 		validator.validate(updateRequest, result);
@@ -187,10 +210,10 @@ public class TreatmentServiceImpl implements TreatmentService {
 			throw new ValidationException("Exception occurred while deleting a treatment by id. The id is null",
 					result);
 		}
-		
+
 		LOG.debug("Checking treatment for existence by id '{}'", id);
 		Treatment treatment = findById(id);
-		
+
 		repository.delete(treatment);
 		LOG.info("The treatment was deleted successfully by id '{}'", id);
 	}

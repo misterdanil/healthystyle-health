@@ -1,10 +1,7 @@
 package org.healthystyle.health.app;
 
-import org.healthystyle.health.model.diet.NutritionValue;
-import org.healthystyle.health.model.diet.Value;
 import org.healthystyle.health.model.measure.Measure;
 import org.healthystyle.health.model.measure.Type;
-import org.healthystyle.health.model.measure.convert.ConvertType;
 import org.healthystyle.health.repository.HealthRepository;
 import org.healthystyle.health.repository.IndicatorTypeRepository;
 import org.healthystyle.health.repository.diet.NutritionValueRepository;
@@ -18,7 +15,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication(scanBasePackages = "org.healthystyle.health")
+@SpringBootApplication(scanBasePackages = { "org.healthystyle.health", "org.healthystyle.util" })
 @EnableJpaRepositories(basePackages = "org.healthystyle.health.repository")
 @EntityScan(basePackages = "org.healthystyle.health.model")
 public class Main {
@@ -78,6 +75,12 @@ public class Main {
 //			nutritionValueRepository.save(nv3);
 //			nutritionValueRepository.save(nv4);
 //			nutritionValueRepository.save(nv5);
+
+			// MEDICINE
+			Measure measureMilil = new Measure(Type.MILLILITRES);
+			Measure measureMililgram = new Measure(Type.MILLIGRAM);
+//			measureRepository.save(measureMilil);
+//			measureRepository.save(measureMililgram);
 
 		};
 	}
