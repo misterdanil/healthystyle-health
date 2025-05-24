@@ -154,9 +154,17 @@ public class FoodServiceImpl implements FoodService {
 
 		LOG.debug("Getting heath for fetching by title: {}", params);
 		Health health = healthAccessor.getHealth();
-
+		
+		Direction direction;
+		if(sort.equals(FoodSort.TITLE)) {
+			direction = Direction.ASC;
+		}
+		else {
+			direction = Direction.DESC;
+		}
+		
 		Page<Food> foods = repository.findByTitle(title, health.getId(),
-				PageRequest.of(page, limit, Sort.by(Direction.DESC, sortTranslator.translateToSort(sort))));
+				PageRequest.of(page, limit, Sort.by(direction, sortTranslator.translateToSort(sort))));
 		LOG.info("Got foods by params '{}' successfully", params);
 
 		return foods;

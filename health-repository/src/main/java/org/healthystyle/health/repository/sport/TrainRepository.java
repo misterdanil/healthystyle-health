@@ -35,6 +35,6 @@ public interface TrainRepository extends JpaRepository<Train, Long> {
 			+ "SELECT t FROM train t INNER JOIN sport s ON t.sport_id = s.id WHERE CURRENT_DATE BETWEEN s.start AND s.end AND t.day = extract(isodow FROM CURRENT_DATE) AND t.time == nextTrainTime AND s.health_id = :healthId", nativeQuery = true)
 	List<Train> findNextTrain(Long healthId);
 
-	@Query("SELECT EXISTS (SELECT t FROM Train t WHERE t.day = :day AND t.time = :time)")
-	boolean existsByDayAndTime(Integer day, LocalTime time);
+	@Query("SELECT EXISTS (SELECT t FROM Train t WHERE t.day = :day AND t.time = :time AND t.sport.id = :sportId)")
+	boolean existsByDayAndTime(Integer day, LocalTime time, Long sportId);
 }

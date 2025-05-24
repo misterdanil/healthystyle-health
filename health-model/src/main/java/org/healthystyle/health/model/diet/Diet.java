@@ -69,6 +69,10 @@ public class Diet {
 		return id;
 	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -78,7 +82,7 @@ public class Diet {
 	}
 
 	public List<Meal> getMeals() {
-		if(meals == null) {
+		if (meals == null) {
 			meals = new ArrayList<>();
 		}
 		return meals;

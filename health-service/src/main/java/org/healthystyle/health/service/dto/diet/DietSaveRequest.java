@@ -1,11 +1,11 @@
 package org.healthystyle.health.service.dto.diet;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
 import org.healthystyle.health.service.validation.annotation.IsAfter;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -18,6 +18,7 @@ public class DietSaveRequest {
 	@NotNull(message = "Укажите дату начала диеты")
 	private LocalDate start;
 	@NotNull(message = "Укажите дату конца диеты")
+	@Future
 	private LocalDate end;
 
 	public String getTitle() {

@@ -63,6 +63,10 @@ public class Intake {
 		return id;
 	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public Plan getPlan() {
 		return plan;
 	}

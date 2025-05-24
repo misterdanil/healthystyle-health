@@ -172,7 +172,7 @@ public class IndicatorTypeServiceImpl implements IndicatorTypeService {
 		ConvertType convertType = convertTypeService.findById(convertTypeId);
 
 		LOG.debug("Getting id of the creator");
-		Long creator = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+		Long creator = Long.valueOf(healthAccessor.getHealth().getUserId());
 
 		LOG.debug("Forming indicator type by params {} and creator {}", saveRequest, creator);
 		IndicatorType indicatorType = new IndicatorType(saveRequest.getName(), measure, convertType, creator);

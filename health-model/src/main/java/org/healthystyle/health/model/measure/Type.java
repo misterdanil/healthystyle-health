@@ -4,31 +4,31 @@ public enum Type {
 	KG {
 		@Override
 		public String toString() {
-			return "Килограммы";
+			return "кг";
 		}
 	},
 	GRAM {
 		@Override
 		public String toString() {
-			return "Граммы";
+			return "г";
 		}
 	},
 	CANTIMETRES {
 		@Override
 		public String toString() {
-			return "Сантиметры";
+			return "см";
 		}
 	},
 	MILLIMETRES {
 		@Override
 		public String toString() {
-			return "Миллиметры";
+			return "мм";
 		}
 	},
 	METRES {
 		@Override
 		public String toString() {
-			return "Метры";
+			return "м";
 		}
 	},
 
@@ -36,7 +36,7 @@ public enum Type {
 	MOLL_LITRES {
 		@Override
 		public String toString() {
-			return "Моль/литры";
+			return "моль/литры";
 		}
 	},
 
@@ -44,13 +44,13 @@ public enum Type {
 	MILLIGRAM {
 		@Override
 		public String toString() {
-			return "Миллиграммы";
+			return "мг";
 		}
 	},
 	MILLILITRES {
 		@Override
 		public String toString() {
-			return "Миллилитры";
+			return "мл";
 		}
 	}
 }

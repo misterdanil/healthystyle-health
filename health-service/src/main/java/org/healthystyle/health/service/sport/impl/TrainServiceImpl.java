@@ -206,7 +206,7 @@ public class TrainServiceImpl implements TrainService {
 		Integer day = saveRequest.getDay();
 		LocalTime time = saveRequest.getTime().truncatedTo(ChronoUnit.SECONDS);
 		LOG.debug("Checking train for existence by day '{}' and time '{}'", day, time);
-		if (repository.existsByDayAndTime(day, time)) {
+		if (repository.existsByDayAndTime(day, time, sportId)) {
 			result.reject("train.save.exists", "Тренировка с таким днём и временем уже существует");
 			throw new TrainExistException(day, time, result);
 		}
@@ -245,7 +245,7 @@ public class TrainServiceImpl implements TrainService {
 		LocalTime time = updateRequest.getTime().truncatedTo(ChronoUnit.SECONDS);
 		if (day != train.getDay() || !time.equals(train.getTime())) {
 			LOG.debug("Checking train for existence by day '{}' and time '{}'", day, time);
-			if (repository.existsByDayAndTime(day, time)) {
+			if (repository.existsByDayAndTime(day, time, train.getId())) {
 				result.reject("train.save.exists", "Тренировка с таким днём и временем уже существует");
 				throw new TrainExistException(day, time, result);
 			}

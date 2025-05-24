@@ -324,11 +324,11 @@ public class IntakeServiceImpl implements IntakeService {
 	}
 
 	@Override
-	public List<Intake> findNotExecuted(int page, int limit) throws ValidationException {
+	public List<MissedDateIntake> findNotExecuted(int page, int limit) throws ValidationException {
 		Health health = healthAccessor.getHealth();
 
 		List<MissedDateIntake> missed = repository.findNotExecuted(health.getId(), page, limit);
-		return null;
+		return missed;
 	}
 
 	@Override

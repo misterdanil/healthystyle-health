@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 import org.healthystyle.health.model.medicine.Intake;
+import org.healthystyle.health.repository.medicine.IntakeRepository.MissedDateIntake;
 import org.healthystyle.health.service.error.ValidationException;
 import org.healthystyle.health.service.error.diet.ConvertTypeNotRecognizedException;
 import org.healthystyle.health.service.error.measure.MeasureNotFoundException;
@@ -48,7 +49,7 @@ public interface IntakeService {
 
 	List<Intake> findNextIntake(int page, int limit) throws ValidationException;
 	
-	List<Intake> findNotExecuted(int page, int limit) throws ValidationException;
+	List<MissedDateIntake> findNotExecuted(int page, int limit) throws ValidationException;
 
 
 	Intake save(IntakeSaveRequest saveRequest, Long planId)

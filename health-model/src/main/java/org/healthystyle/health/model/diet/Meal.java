@@ -81,6 +81,10 @@ public class Meal {
 		return id;
 	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public Set<MealFood> getFoods() {
 		if (foods == null) {
 			foods = new LinkedHashSet<>();

@@ -3,6 +3,7 @@ package org.healthystyle.health.web.medicine;
 import java.util.List;
 
 import org.healthystyle.health.model.medicine.Intake;
+import org.healthystyle.health.repository.medicine.IntakeRepository.MissedDateIntake;
 import org.healthystyle.health.service.error.ValidationException;
 import org.healthystyle.health.service.medicine.IntakeService;
 import org.healthystyle.health.web.dto.ErrorResponse;
@@ -46,13 +47,13 @@ public class IntakeController {
 
 	@GetMapping(value = "/intakes", params = "missed")
 	public ResponseEntity<?> getMissedIntakes(@RequestParam int page, @RequestParam int limit) {
-		List<Intake> intakes;
+		List<MissedDateIntake> intakes;
 		try {
 			intakes = service.findNotExecuted(page, limit);
 		} catch (ValidationException e) {
 			return ResponseEntity.badRequest().body(new ErrorResponse(e.getGlobalErrors(), e.getFieldErrors()));
 		}
 
-		return ResponseEntity.ok(intakes.stream().map(mapper::toDto));
+		return ResponseEntity.ok(intakes);
 	}
 }

@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,6 +29,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableScheduling
 public class SecurityConfig {
 	@Autowired
 	private InitializationHealthFilter initializationHealthFilter;
@@ -35,7 +37,7 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterCharin(HttpSecurity http) throws Exception {
 		return http
-				.authorizeHttpRequests(req -> req.requestMatchers("/oauth2/redirect", "/auth/health").permitAll()
+				.authorizeHttpRequests(req -> req.requestMatchers("/oauth2/redirect", "/auth/health", "/oauth2/refresh").permitAll()
 						.anyRequest().authenticated())
 				.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable())
 				.oauth2ResourceServer(r -> r.jwt(Customizer.withDefaults()))

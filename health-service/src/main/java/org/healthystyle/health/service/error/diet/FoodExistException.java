@@ -7,7 +7,7 @@ public class FoodExistException extends AbstractException {
 	private String title;
 
 	public FoodExistException(String title, BindingResult result) {
-		super(result, "Could not found a food by title '%s'", title);
+		super(result, "Food with title '%s' has already existed", title);
 		this.title = title;
 	}
 

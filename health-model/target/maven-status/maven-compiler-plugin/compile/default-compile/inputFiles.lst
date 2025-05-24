@@ -1,6 +1,7 @@
 /home/daniel/eclipse-workspace/healthystyle/health/health-model/src/main/java/org/healthystyle/health/model/Health.java
 /home/daniel/eclipse-workspace/healthystyle/health/health-model/src/main/java/org/healthystyle/health/model/Indicator.java
 /home/daniel/eclipse-workspace/healthystyle/health/health-model/src/main/java/org/healthystyle/health/model/IndicatorType.java
+/home/daniel/eclipse-workspace/healthystyle/health/health-model/src/main/java/org/healthystyle/health/model/Timezone.java
 /home/daniel/eclipse-workspace/healthystyle/health/health-model/src/main/java/org/healthystyle/health/model/diet/Diet.java
 /home/daniel/eclipse-workspace/healthystyle/health/health-model/src/main/java/org/healthystyle/health/model/diet/Food.java
 /home/daniel/eclipse-workspace/healthystyle/health/health-model/src/main/java/org/healthystyle/health/model/diet/FoodSet.java

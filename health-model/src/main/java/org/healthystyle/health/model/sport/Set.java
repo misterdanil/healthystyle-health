@@ -53,6 +53,10 @@ public class Set {
 		return id;
 	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public Exercise getExercise() {
 		return exercise;
 	}

@@ -15,7 +15,7 @@ public class SportSaveRequest {
 	@NotBlank(message = "Укажите описание")
 	private String description;
 	@NotNull(message = "Укажите начало")
-	@FutureOrPresent(message = "Дата начала должна быть в будущем или настоящем")
+//	@FutureOrPresent(message = "Дата начала должна быть в будущем или настоящем")
 	private LocalDate start;
 	@NotNull(message = "Укажите конец")
 	@FutureOrPresent(message = "Дата конца должна быть в будущем или настоящем")

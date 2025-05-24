@@ -45,6 +45,10 @@ public abstract class ConvertType {
 		return id;
 	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public BigDecimal getMinValue() {
 		return minValue;
 	}

@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -39,11 +40,14 @@ public interface IntakeRepository extends JpaRepository<Intake, Long> {
 	@Query(value = "WITH nextIntakeTime AS ("
 			+ "SELECT i.time FROM intake i INNER JOIN plan p ON i.plan_id = p.id INNER JOIN health h ON h.id = p.health_id WHERE CURRENT_DATE BETWEEN p.start AND p.finish AND i.day = extract(isodow FROM CURRENT_DATE) AND i.time >= CURRENT_TIME AND h.id = :healthId ORDER BY i.time DESC LIMIT 1"
 			+ ")"
-			+ "SELECT i.* FROM intake i INNER JOIN plan p ON i.plan_id = p.id INNER JOIN nextIntakeTime nit ON nit.time = i.time LEFT JOIN intake_result ir ON ir.intake_id = i.id WHERE ir.id IS NULL AND CURRENT_DATE BETWEEN p.start AND p.finish AND i.day = extract(isodow FROM CURRENT_DATE) OFFSET (:page - 1) * :limit LIMIT :limit", nativeQuery = true)
+			+ "SELECT i.* FROM intake i INNER JOIN plan p ON i.plan_id = p.id INNER JOIN nextIntakeTime nit ON nit.time = i.time LEFT JOIN intake_result ir ON ir.intake_id = i.id AND ir.created_on = CURRENT_DATE WHERE ir.id IS NULL AND CURRENT_DATE BETWEEN p.start AND p.finish AND i.day = extract(isodow FROM CURRENT_DATE) OFFSET (:page - 1) * :limit LIMIT :limit", nativeQuery = true)
 	List<Intake> findNextIntake(Long healthId, int page, int limit);
 
-	@Query(value = "SELECT i.id, p.start, p.finish, i.time, i.day, i.weight, meas.type, m.name, t.description, d + i.time FROM plan p INNER JOIN medicine m ON p.medicine_id = m.id INNER JOIN health h ON h.id = p.health_id INNER JOIN intake i on i.plan_id = p.id INNER JOIN measure meas ON meas.id = i.measure_id INNER JOIN GENERATE_SERIES(p.start, CURRENT_DATE, interval '1' day) AS d ON extract(isodow from d) = i.day LEFT JOIN intake_result r ON r.intake_id = i.id AND EXTRACT(day FROM r.created_on) = EXTRACT(day FROM d) INNER JOIN treatment t ON p.treatment_id = t.id WHERE h.id = :healthId AND r IS NULL ORDER BY d DESC OFFSET (:page - 1) * :limit LIMIT :limit", nativeQuery = true)
+	@Query(value = "SELECT i.id, p.start, p.finish, i.time, i.day, i.weight, meas.type, m.name, t.description, d + i.time FROM plan p INNER JOIN medicine m ON p.medicine_id = m.id INNER JOIN health h ON h.id = p.health_id INNER JOIN intake i on i.plan_id = p.id INNER JOIN measure meas ON meas.id = i.measure_id INNER JOIN GENERATE_SERIES(p.start, CURRENT_DATE, interval '1' day) AS d ON extract(isodow from d) = i.day LEFT JOIN intake_result r ON r.intake_id = i.id AND EXTRACT(day FROM r.created_on) = EXTRACT(day FROM d) INNER JOIN treatment t ON p.treatment_id = t.id WHERE h.id = :healthId AND r IS NULL ORDER BY d + i.time DESC OFFSET (:page - 1) * :limit LIMIT :limit", nativeQuery = true)
 	List<MissedDateIntake> findNotExecuted(Long healthId, int page, int limit);
+
+	@Query(value = "SELECT i.id, p.start, p.finish, i.time, i.day, i.weight, meas.type, m.name, t.description, d + i.time, h.user_id FROM plan p INNER JOIN medicine m ON p.medicine_id = m.id INNER JOIN health h ON h.id = p.health_id INNER JOIN intake i on i.plan_id = p.id INNER JOIN measure meas ON meas.id = i.measure_id INNER JOIN GENERATE_SERIES(:start, :end, interval '1' hour) AS d ON extract(isodow from d) = i.day AND extract(hour from d) = extract(hour from i.time) LEFT JOIN intake_result r ON r.intake_id = i.id AND EXTRACT(day FROM r.created_on) = EXTRACT(day FROM d) INNER JOIN treatment t ON p.treatment_id = t.id WHERE r IS NULL ORDER BY d + i.time DESC", nativeQuery = true)
+	List<MissedDateIntake> findNotExecuted(LocalDateTime start, LocalDateTime end);
 
 	@Query("SELECT EXISTS (SELECT i FROM Intake i INNER JOIN i.plan p WHERE i.time = :time AND i.day = :day AND p.id = :planId)")
 	boolean existsByTimeAndDayAndPlanId(LocalTime time, Integer day, Long planId);
@@ -55,10 +59,11 @@ public interface IntakeRepository extends JpaRepository<Intake, Long> {
 		private LocalTime time;
 		private Integer day;
 		private String weight;
-		private Type measure;
+		private String measure;
 		private String medicineName;
 		private String treatmentDescription;
 		private Instant date;
+		private Long userId;
 
 		public MissedDateIntake() {
 			super();
@@ -73,10 +78,26 @@ public interface IntakeRepository extends JpaRepository<Intake, Long> {
 			this.time = Instant.ofEpochMilli(time.getTime()).atZone(ZoneId.systemDefault()).toLocalTime();
 			this.day = day;
 			this.weight = weight;
-			this.measure = Type.valueOf(measure);
+			this.measure = Type.valueOf(measure).toString();
 			this.medicineName = medicineName;
 			this.treatmentDescription = treatmentDescription;
 			this.date = date;
+		}
+
+		public MissedDateIntake(Long id, Date planStart, Date planEnd, Time time, Integer day, String weight,
+				String measure, String medicineName, String treatmentDescription, Instant date, Long userId) {
+			super();
+			this.id = id;
+			this.planStart = Instant.ofEpochMilli(planStart.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+			this.planEnd = Instant.ofEpochMilli(planEnd.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+			this.time = Instant.ofEpochMilli(time.getTime()).atZone(ZoneId.systemDefault()).toLocalTime();
+			this.day = day;
+			this.weight = weight;
+			this.measure = Type.valueOf(measure).toString();
+			this.medicineName = medicineName;
+			this.treatmentDescription = treatmentDescription;
+			this.date = date;
+			this.userId = userId;
 		}
 
 		public Long getId() {
@@ -127,11 +148,11 @@ public interface IntakeRepository extends JpaRepository<Intake, Long> {
 			this.weight = weight;
 		}
 
-		public Type getMeasure() {
+		public String getMeasure() {
 			return measure;
 		}
 
-		public void setMeasure(Type measure) {
+		public void setMeasure(String measure) {
 			this.measure = measure;
 		}
 
@@ -157,6 +178,14 @@ public interface IntakeRepository extends JpaRepository<Intake, Long> {
 
 		public void setDate(Instant date) {
 			this.date = date;
+		}
+
+		public Long getUserId() {
+			return userId;
+		}
+
+		public void setUserId(Long userId) {
+			this.userId = userId;
 		}
 
 	}
