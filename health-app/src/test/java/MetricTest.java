@@ -159,9 +159,63 @@ public class MetricTest {
 			indicatorTypeService.save(indicatorTypeSaveRequest);
 		});
 	}
+	
+	@Test
+	public void createIndicatorWithoutDateTest()
+			throws ValidationException, NameExistedException, MeasureNotFoundException, ConvertTypeNotFoundException {
+		indicatorTypeSaveRequest.setConvertTypeId(3L);
+
+		when(accessor.getHealth()).thenReturn(health);
+
+		when(indicatorTypeRepository.save(indicatorType)).thenReturn(indicatorType);
+		when(measureRepository.findByType(indicatorType.getMeasure().getType())).thenReturn(measureKG);
+		when(convertTypeRepository.findById(1L)).thenReturn(Optional.of(convertTypeFl));
+		when(convertTypeRepository.findById(2L)).thenReturn(Optional.of(convertTypeInt));
+
+		assertThrows(ConvertTypeNotFoundException.class, () -> {
+			indicatorTypeService.save(indicatorTypeSaveRequest);
+		});
+	}
+	
+	@Test
+	public void createIndicatorDateFutureTest()
+			throws ValidationException, NameExistedException, MeasureNotFoundException, ConvertTypeNotFoundException {
+		indicatorTypeSaveRequest.setConvertTypeId(3L);
+
+		when(accessor.getHealth()).thenReturn(health);
+
+		when(indicatorTypeRepository.save(indicatorType)).thenReturn(indicatorType);
+		when(measureRepository.findByType(indicatorType.getMeasure().getType())).thenReturn(measureKG);
+		when(convertTypeRepository.findById(1L)).thenReturn(Optional.of(convertTypeFl));
+		when(convertTypeRepository.findById(2L)).thenReturn(Optional.of(convertTypeInt));
+
+		assertThrows(ConvertTypeNotFoundException.class, () -> {
+			indicatorTypeService.save(indicatorTypeSaveRequest);
+		});
+	}
 
 	@Test
 	public void createIndicatorTypeMeasureIsNotFoundTest()
+			throws ValidationException, NameExistedException, MeasureNotFoundException, ConvertTypeNotFoundException {
+		indicatorTypeSaveRequest.setType(Type.GRAM);
+
+		when(accessor.getHealth()).thenReturn(health);
+
+		when(measureRepository.findByType(Type.KG)).thenReturn(measureKG);
+		when(measureRepository.findByType(Type.CANTIMETRES)).thenReturn(measureCM);
+
+		when(indicatorTypeRepository.save(indicatorType)).thenReturn(indicatorType);
+		when(measureRepository.findByType(indicatorType.getMeasure().getType())).thenReturn(measureKG);
+		when(convertTypeRepository.findById(1L)).thenReturn(Optional.of(convertTypeFl));
+		when(convertTypeRepository.findById(2L)).thenReturn(Optional.of(convertTypeInt));
+
+		assertThrows(MeasureNotFoundException.class, () -> {
+			indicatorTypeService.save(indicatorTypeSaveRequest);
+		});
+	}
+	
+	@Test
+	public void createIndicatorConvertTypeWrongFoundTest()
 			throws ValidationException, NameExistedException, MeasureNotFoundException, ConvertTypeNotFoundException {
 		indicatorTypeSaveRequest.setType(Type.GRAM);
 

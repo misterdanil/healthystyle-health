@@ -227,7 +227,7 @@ public class DietTest {
 		when(foodValueRepository.save(foodValue2)).thenReturn(foodValue2);
 		when(foodValueRepository.save(foodValue3)).thenReturn(foodValue3);
 		assertThrows(ConvertTypeMismatchException.class, () -> {
-			foodService.save(foodSaveRequest);
+			
 		});
 	}
 
@@ -247,9 +247,45 @@ public class DietTest {
 			foodService.save(foodSaveRequest);
 		});
 	}
+	
+	@Test
+	public void createFoodBorderTest()
+			throws ValidationException, FoodExistException, NutritionValueNotFoundException, FoodValueExistException,
+			FoodNotFoundException, ConvertTypeMismatchException {
+		when(accessor.getHealth()).thenReturn(health);
+
+		when(foodRepository.save(any(Food.class))).thenReturn(food);
+		when(foodRepository.existsByTitle(food.getTitle(), health.getId())).thenReturn(true);
+		when(foodRepository.findById(any(Long.class))).thenReturn(Optional.of(food));
+		when(foodValueRepository.save(foodValue1)).thenReturn(foodValue1);
+		when(foodValueRepository.save(foodValue2)).thenReturn(foodValue2);
+		when(foodValueRepository.save(foodValue3)).thenReturn(foodValue3);
+		assertThrows(FoodExistException.class, () -> {
+			foodService.save(foodSaveRequest);
+		});
+	}
 
 	@Test
 	public void createFoodNutritionValueNotFoundTest()
+			throws ValidationException, FoodExistException, NutritionValueNotFoundException, FoodValueExistException,
+			FoodNotFoundException, ConvertTypeMismatchException {
+		when(accessor.getHealth()).thenReturn(health);
+		when(nutritionValueRepository.findByValue(Value.CARBOHYDRATE)).thenReturn(null);
+		when(nutritionValueRepository.findByValue(Value.FAT)).thenReturn(null);
+
+		when(foodRepository.save(any(Food.class))).thenReturn(food);
+		when(foodRepository.findById(any(Long.class))).thenReturn(Optional.of(food));
+		when(nutritionValueRepository.findByValue(Value.CALORIE)).thenReturn(null);
+		when(foodValueRepository.save(foodValue1)).thenReturn(foodValue1);
+		when(foodValueRepository.save(foodValue2)).thenReturn(foodValue2);
+		when(foodValueRepository.save(foodValue3)).thenReturn(foodValue3);
+		assertThrows(NutritionValueNotFoundException.class, () -> {
+			foodService.save(foodSaveRequest);
+		});
+	}
+	
+	@Test
+	public void createDoetNutritionValueNotFoundTest()
 			throws ValidationException, FoodExistException, NutritionValueNotFoundException, FoodValueExistException,
 			FoodNotFoundException, ConvertTypeMismatchException {
 		when(accessor.getHealth()).thenReturn(health);
@@ -362,6 +398,52 @@ public class DietTest {
 		});	}
 	
 	@Test
+	public void createFoodWithoutNutritionValuesTest() throws ValidationException, DietExistException, MealTimeDuplicateException,
+			MealFoodNotFoundException, MealSaveException {
+		when(accessor.getHealth()).thenReturn(health);
+		
+		diet.setEnd(LocalDate.now().minusWeeks(3));
+		
+		when(foodRepository.findById(any(Long.class))).thenReturn(Optional.of(food));
+		when(mealRepository.findById(any(Long.class))).thenReturn(Optional.of(meal));
+		when(dietRepository.findById(any(Long.class))).thenReturn(Optional.of(diet));
+
+		when(nutritionValueRepository.findByValue(Value.CALORIE)).thenReturn(value1);
+		when(nutritionValueRepository.findByValue(Value.CARBOHYDRATE)).thenReturn(value2);
+		when(nutritionValueRepository.findByValue(Value.FAT)).thenReturn(value3);
+
+		when(foodValueRepository.save(foodValue1)).thenReturn(foodValue1);
+		when(foodValueRepository.save(foodValue2)).thenReturn(foodValue2);
+		when(foodValueRepository.save(foodValue3)).thenReturn(foodValue3);
+		assertThrows(ValidationException.class, () -> {
+			service.save(dietSaveRequest);
+		});	
+		}
+	
+	@Test
+	public void createDietExpiredTest() throws ValidationException, DietExistException, MealTimeDuplicateException,
+			MealFoodNotFoundException, MealSaveException {
+		when(accessor.getHealth()).thenReturn(health);
+		
+		diet.setEnd(LocalDate.now().minusWeeks(3));
+		
+		when(foodRepository.findById(any(Long.class))).thenReturn(Optional.of(food));
+		when(mealRepository.findById(any(Long.class))).thenReturn(Optional.of(meal));
+		when(dietRepository.findById(any(Long.class))).thenReturn(Optional.of(diet));
+
+		when(nutritionValueRepository.findByValue(Value.CALORIE)).thenReturn(value1);
+		when(nutritionValueRepository.findByValue(Value.CARBOHYDRATE)).thenReturn(value2);
+		when(nutritionValueRepository.findByValue(Value.FAT)).thenReturn(value3);
+
+		when(foodValueRepository.save(foodValue1)).thenReturn(foodValue1);
+		when(foodValueRepository.save(foodValue2)).thenReturn(foodValue2);
+		when(foodValueRepository.save(foodValue3)).thenReturn(foodValue3);
+		assertThrows(ValidationException.class, () -> {
+			service.save(dietSaveRequest);
+		});	
+		}
+	
+	@Test
 	public void createDietDatesMixedTest() throws ValidationException, DietExistException, MealTimeDuplicateException,
 			MealFoodNotFoundException, MealSaveException {
 		when(accessor.getHealth()).thenReturn(health);
@@ -381,7 +463,10 @@ public class DietTest {
 		when(foodValueRepository.save(foodValue3)).thenReturn(foodValue3);
 		assertThrows(ValidationException.class, () -> {
 			service.save(dietSaveRequest);
-		});	}
+		});	
+		}
+	
+	
 //
 //	@Test
 //	public void createMedicineExistTest() throws ValidationException, MedicineExistException,

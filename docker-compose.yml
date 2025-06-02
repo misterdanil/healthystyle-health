@@ -1,0 +1,233 @@
+services:
+  auth-db:
+    image: postgres:15
+    container_name: auth-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_AUTH_DB}
+    volumes:
+      - ./authentication/init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
+    restart: always
+    networks:
+      - app-network 
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: authentication/Dockerfile
+    ports:
+      - "3003:3003"
+    depends_on:
+      - auth-db
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/${POSTGRES_AUTH_DB}?reWriteBatchedInserts=true
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+    restart: always
+    networks:
+      - app-network
+  
+  health-db:
+    image: postgres:15
+    container_name: health-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_HEALTH_DB}
+    volumes:
+      - ./health/init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5434:5432"
+    restart: always
+    networks:
+      - app-network 
+
+  health-service:
+    build:
+      context: .
+      dockerfile: health/Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - health-db
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://health-db:5432/${POSTGRES_HEALTH_DB}?reWriteBatchedInserts=true
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+    restart: always
+    networks:
+      - app-network
+
+  event-db:
+    image: postgres:15
+    container_name: event-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_EVENT_DB}
+    volumes:
+      - ./event/init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5435:5432"
+    restart: always
+    networks:
+      - app-network 
+
+  event-service:
+    build:
+      context: .
+      dockerfile: event/Dockerfile
+    ports:
+      - "3002:3002"
+    depends_on:
+      - event-db
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://event-db:5432/${POSTGRES_EVENT_DB}?reWriteBatchedInserts=true
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+    restart: always
+    networks:
+      - app-network
+
+  article-db:
+    image: postgres:15
+    container_name: article-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_ARTICLE_DB}
+    volumes:
+      - ./article/init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5436:5432"
+    restart: always
+    networks:
+      - app-network 
+
+  article-service:
+    build:
+      context: .
+      dockerfile: article/Dockerfile
+    ports:
+      - "3005:3005"
+    depends_on:
+      - article-db
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://article-db:5432/${POSTGRES_ARTICLE_DB}?reWriteBatchedInserts=true
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+    restart: always
+    networks:
+      - app-network
+
+  notification-db:
+    image: postgres:15
+    container_name: notification-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_NOTIFICATION_DB}
+    volumes:
+      - ./notification/init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5437:5432"
+    restart: always
+    networks:
+      - app-network 
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification/Dockerfile
+    ports:
+      - "3004:3004"
+    depends_on:
+      - notification-db
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/${POSTGRES_NOTIFICATION_DB}?reWriteBatchedInserts=true
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+    restart: always
+    networks:
+      - app-network
+      
+  filesystem-db:
+    image: postgres:15
+    container_name: filesystem-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_FILESYSTEM_DB}
+    volumes:
+      - ./filesystem/init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5438:5432"
+    restart: always
+    networks:
+      - app-network 
+
+  filesystem-service:
+    build:
+      context: .
+      dockerfile: filesystem/Dockerfile
+    ports:
+      - "3006:3006"
+    depends_on:
+      - filesystem-db
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://filesystem-db:5432/${POSTGRES_FILESYSTEM_DB}?reWriteBatchedInserts=true
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+    restart: always
+    networks:
+      - app-network
+      
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    ports:
+      - "3010:3010"
+    depends_on:
+      - auth-service
+      - health-service
+      - event-service
+      - article-service
+      - filesystem-service
+      - notification-service
+    restart: always
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: james
+      RABBITMQ_DEFAULT_PASS: 147852369
+    restart: always
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

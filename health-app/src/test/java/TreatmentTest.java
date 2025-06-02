@@ -132,6 +132,42 @@ public class TreatmentTest {
 			medicineService.save(saveRequest);
 		});
 	}
+	
+	@Test
+	public void createMedicineWithoutWeightTest() throws ValidationException, MedicineExistException,
+			WeightNegativeOrZeroException, ConvertTypeNotRecognizedException, MeasureNotFoundException {
+		Health health = new Health(1L);
+		health.setId(1L);
+
+		when(accessor.getHealth()).thenReturn(health);
+
+		MedicineSaveRequest saveRequest = new MedicineSaveRequest();
+		saveRequest.setName("Грипферон");
+
+		Medicine medicine = new Medicine("Грипферон", health);
+
+		when(medicineRepository.save(any(Medicine.class))).thenReturn(medicine);
+		medicineService.save(saveRequest);
+		verify(medicineRepository, times(1)).save(any(Medicine.class));
+	}
+	
+	@Test
+	public void createTreatmentOverlapsTest() throws ValidationException, MedicineExistException,
+			WeightNegativeOrZeroException, ConvertTypeNotRecognizedException, MeasureNotFoundException {
+		Health health = new Health(1L);
+		health.setId(1L);
+
+		when(accessor.getHealth()).thenReturn(health);
+
+		MedicineSaveRequest saveRequest = new MedicineSaveRequest();
+		saveRequest.setName("Грипферон");
+
+		Medicine medicine = new Medicine("Грипферон", health);
+
+		when(medicineRepository.save(any(Medicine.class))).thenReturn(medicine);
+		medicineService.save(saveRequest);
+		verify(medicineRepository, times(1)).save(any(Medicine.class));
+	}
 
 	@Test
 	public void createMedicineWeightNotRecognizedTest() throws ValidationException, MedicineExistException,

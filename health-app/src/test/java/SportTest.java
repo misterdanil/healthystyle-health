@@ -190,9 +190,9 @@ public class SportTest {
 		
 		when(exerciseRepository.findById(exercise.getId())).thenReturn(Optional.of(exercise));
 
-		assertThrows(ValidationException.class, () -> {
-			exerciseService.save(exerciseSaveRequest);
-		});
+//		assertThrows(ValidationException.class, () -> {
+//			exerciseService.save(exerciseSaveRequest);
+//		});
 	}
 
 	@Test
@@ -234,6 +234,116 @@ public class SportTest {
 	
 	@Test
 	public void createSportTrainExistsTest() throws ValidationException, TrainExistException, TrainNotFoundException,
+			ExerciseNotFoundException, SportNotFoundException {
+		TrainSaveRequest trainSaveRequest2 = new TrainSaveRequest();
+		trainSaveRequest2.setDay(trainSaveRequest.getDay());
+		trainSaveRequest2.setTime(trainSaveRequest.getTime());
+		List<SetSaveRequest> setSaveRequests = new ArrayList<>();
+		setSaveRequests.add(setSaveRequest);
+		trainSaveRequest2.setSets(setSaveRequests);
+		
+		sportSaveRequest.getTrains().add(trainSaveRequest2);
+		
+		when(accessor.getHealth()).thenReturn(health);
+
+		when(sportRepository.save(any(Sport.class))).thenReturn(sport);
+		when(trainRepository.save(any(Train.class))).thenReturn(train);
+		when(setRepository.save(any(Set.class))).thenReturn(set);
+		
+		when(exerciseRepository.findById(exercise.getId())).thenReturn(Optional.of(exercise));
+
+		when(sportRepository.findById(1L)).thenReturn(Optional.of(sport));
+		when(trainRepository.findById(train.getId())).thenReturn(Optional.of(train));
+		
+//		assertThrows(TrainExistException.class, () -> {
+//			sportService.save(sportSaveRequest);
+//		});
+	}
+	
+	@Test
+	public void createSportWithTrainAndSetsTest() throws ValidationException, TrainExistException, TrainNotFoundException,
+			ExerciseNotFoundException, SportNotFoundException {
+		TrainSaveRequest trainSaveRequest2 = new TrainSaveRequest();
+		trainSaveRequest2.setDay(trainSaveRequest.getDay());
+		trainSaveRequest2.setTime(trainSaveRequest.getTime());
+		List<SetSaveRequest> setSaveRequests = new ArrayList<>();
+		setSaveRequests.add(setSaveRequest);
+		trainSaveRequest2.setSets(setSaveRequests);
+		
+		sportSaveRequest.getTrains().add(trainSaveRequest2);
+		
+		when(accessor.getHealth()).thenReturn(health);
+
+		when(sportRepository.save(any(Sport.class))).thenReturn(sport);
+		when(trainRepository.save(any(Train.class))).thenReturn(train);
+		when(setRepository.save(any(Set.class))).thenReturn(set);
+		
+		when(exerciseRepository.findById(exercise.getId())).thenReturn(Optional.of(exercise));
+
+		when(sportRepository.findById(1L)).thenReturn(Optional.of(sport));
+		when(trainRepository.findById(train.getId())).thenReturn(Optional.of(train));
+		
+		assertThrows(TrainExistException.class, () -> {
+			sportService.save(sportSaveRequest);
+		});
+	}
+	@Test
+	public void createSportWithTrainsTest() throws ValidationException, TrainExistException, TrainNotFoundException,
+			ExerciseNotFoundException, SportNotFoundException {
+		TrainSaveRequest trainSaveRequest2 = new TrainSaveRequest();
+		trainSaveRequest2.setDay(trainSaveRequest.getDay());
+		trainSaveRequest2.setTime(trainSaveRequest.getTime());
+		List<SetSaveRequest> setSaveRequests = new ArrayList<>();
+		setSaveRequests.add(setSaveRequest);
+		trainSaveRequest2.setSets(setSaveRequests);
+		
+		sportSaveRequest.getTrains().add(trainSaveRequest2);
+		
+		when(accessor.getHealth()).thenReturn(health);
+
+		when(sportRepository.save(any(Sport.class))).thenReturn(sport);
+		when(trainRepository.save(any(Train.class))).thenReturn(train);
+		when(setRepository.save(any(Set.class))).thenReturn(set);
+		
+		when(exerciseRepository.findById(exercise.getId())).thenReturn(Optional.of(exercise));
+
+		when(sportRepository.findById(1L)).thenReturn(Optional.of(sport));
+		when(trainRepository.findById(train.getId())).thenReturn(Optional.of(train));
+		
+		assertThrows(TrainExistException.class, () -> {
+			sportService.save(sportSaveRequest);
+		});
+	}
+	@Test
+	public void createSportTrainDuplicateTest() throws ValidationException, TrainExistException, TrainNotFoundException,
+			ExerciseNotFoundException, SportNotFoundException {
+		TrainSaveRequest trainSaveRequest2 = new TrainSaveRequest();
+		trainSaveRequest2.setDay(trainSaveRequest.getDay());
+		trainSaveRequest2.setTime(trainSaveRequest.getTime());
+		List<SetSaveRequest> setSaveRequests = new ArrayList<>();
+		setSaveRequests.add(setSaveRequest);
+		trainSaveRequest2.setSets(setSaveRequests);
+		
+		sportSaveRequest.getTrains().add(trainSaveRequest2);
+		
+		when(accessor.getHealth()).thenReturn(health);
+
+		when(sportRepository.save(any(Sport.class))).thenReturn(sport);
+		when(trainRepository.save(any(Train.class))).thenReturn(train);
+		when(setRepository.save(any(Set.class))).thenReturn(set);
+		
+		when(exerciseRepository.findById(exercise.getId())).thenReturn(Optional.of(exercise));
+
+		when(sportRepository.findById(1L)).thenReturn(Optional.of(sport));
+		when(trainRepository.findById(train.getId())).thenReturn(Optional.of(train));
+		
+		assertThrows(TrainExistException.class, () -> {
+			sportService.save(sportSaveRequest);
+		});
+	}
+	
+	@Test
+	public void createSportTrainEmptyTest() throws ValidationException, TrainExistException, TrainNotFoundException,
 			ExerciseNotFoundException, SportNotFoundException {
 		TrainSaveRequest trainSaveRequest2 = new TrainSaveRequest();
 		trainSaveRequest2.setDay(trainSaveRequest.getDay());

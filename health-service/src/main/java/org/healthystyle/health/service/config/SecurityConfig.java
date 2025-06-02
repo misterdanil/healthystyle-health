@@ -28,7 +28,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @EnableScheduling
 public class SecurityConfig {
 	@Autowired
@@ -37,8 +37,8 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterCharin(HttpSecurity http) throws Exception {
 		return http
-				.authorizeHttpRequests(req -> req.requestMatchers("/oauth2/redirect", "/auth/health", "/oauth2/refresh").permitAll()
-						.anyRequest().authenticated())
+				.authorizeHttpRequests(req -> req.requestMatchers("/oauth2/redirect", "/auth/health", "/oauth2/refresh")
+						.permitAll().anyRequest().authenticated())
 				.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable())
 				.oauth2ResourceServer(r -> r.jwt(Customizer.withDefaults()))
 				.addFilterAfter(initializationHealthFilter, BearerTokenAuthenticationFilter.class).build();
@@ -48,7 +48,8 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:3003"));
+		configuration.setAllowedOrigins(
+				Arrays.asList("http://localhost:3000", "http://localhost:3003", "http://localhost:3010"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));
 		configuration.setAllowedMethods(Arrays.asList("*"));
 		configuration.setAllowCredentials(true);
@@ -66,7 +67,7 @@ public class SecurityConfig {
 
 	@Bean
 	public NimbusJwtDecoder jwtDecoder() {
-		NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri("http://localhost:3003/oauth2/jwks").build();
+		NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri("http://auth-service:3003/oauth2/jwks").build();
 
 		return decoder;
 	}
@@ -76,7 +77,7 @@ public class SecurityConfig {
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
 		body.add("client_id", "dwadw");
-		body.add("client_secret", "dwadwad");
+		body.add("client_secret", "dwad");
 		body.add("redirect_uri", "dwadw");
 		body.add("code", "dwadadw");
 		System.out.println(body);
