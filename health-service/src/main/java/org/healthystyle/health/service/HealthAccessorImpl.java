@@ -6,6 +6,7 @@ import org.healthystyle.health.service.error.health.HealthNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +19,13 @@ public class HealthAccessorImpl implements HealthAccessor {
 
 	@Override
 	public Health getHealth() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return null;
+		}
 		Long id = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 		try {
-			return service.findByUserId(Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()));
+			return service.findByUserId(id);
 		} catch (ValidationException e) {
 			LOG.error("Something wrong happened while getting health. The user id is invalid: {}", e, id);
 		} catch (HealthNotFoundException e) {

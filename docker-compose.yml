@@ -56,11 +56,14 @@ services:
     depends_on:
       - health-db
       - rabbitmq
+      - redis
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://health-db:5432/${POSTGRES_HEALTH_DB}?reWriteBatchedInserts=true
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_PROFILES_ACTIVE: docker
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
     restart: always
     networks:
       - app-network
@@ -227,7 +230,16 @@ services:
     restart: always
     networks:
       - app-network
-
+  redis:
+    image: redis:7.2
+    container_name: redis
+    hostname: redis
+    restart: always
+    ports:
+      - "6380:6379"
+    networks:
+      - app-network
+  
 networks:
   app-network:
     driver: bridge

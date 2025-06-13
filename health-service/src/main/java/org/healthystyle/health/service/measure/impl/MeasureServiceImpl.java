@@ -13,6 +13,7 @@ import org.healthystyle.health.service.measure.MeasureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -25,6 +26,7 @@ public class MeasureServiceImpl implements MeasureService {
 	private static final Logger LOG = LoggerFactory.getLogger(MeasureServiceImpl.class);
 
 	@Override
+	@Cacheable
 	public Measure findByType(Type type) throws ValidationException, MeasureNotFoundException {
 		BindingResult result = new MapBindingResult(new LinkedHashMap<>(), "measure");
 

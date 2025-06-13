@@ -2,6 +2,7 @@ package org.healthystyle.health.service.schedule;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.healthystyle.health.repository.medicine.IntakeRepository;
@@ -21,8 +22,8 @@ public class IntakeScheduler {
 	@Scheduled(cron = "0 0/1 * * * ?")
 	public void reportNotExecutedIntakes() {
 		System.out.println("report " + Instant.now());
-		LocalDateTime end = LocalDateTime.now();
-		LocalDateTime start = end.minusHours(10);
+		Instant start = Instant.now();
+		Instant end = start.plus(1, ChronoUnit.HOURS);
 		List<MissedDateIntake> intakes = repository.findNotExecuted(start, end);
 		notifier.notifyMissed(intakes.toArray(new MissedDateIntake[intakes.size()]));
 	}

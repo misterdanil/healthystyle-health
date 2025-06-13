@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.healthystyle.health.service.config.init.InitializationHealthFilter;
+import org.healthystyle.health.service.timezone.TimeZoneFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -33,15 +35,19 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 	@Autowired
 	private InitializationHealthFilter initializationHealthFilter;
+	@Autowired
+	private TimeZoneFilter timezoneFilter;
 
 	@Bean
 	public SecurityFilterChain filterCharin(HttpSecurity http) throws Exception {
 		return http
-				.authorizeHttpRequests(req -> req.requestMatchers("/oauth2/redirect", "/auth/health", "/oauth2/refresh")
-						.permitAll().anyRequest().authenticated())
+				.authorizeHttpRequests(
+						req -> req.requestMatchers("/oauth2/redirect", "/auth/health", "/oauth2/refresh", "/time")
+								.permitAll().anyRequest().authenticated())
 				.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable())
 				.oauth2ResourceServer(r -> r.jwt(Customizer.withDefaults()))
-				.addFilterAfter(initializationHealthFilter, BearerTokenAuthenticationFilter.class).build();
+				.addFilterAfter(initializationHealthFilter, BearerTokenAuthenticationFilter.class)
+				.addFilterAfter(timezoneFilter, InitializationHealthFilter.class).build();
 	}
 
 	@Bean

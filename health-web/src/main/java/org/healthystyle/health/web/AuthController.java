@@ -7,9 +7,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.healthystyle.health.repository.diet.MealRepository;
 import org.healthystyle.health.web.dto.ErrorResponse;
 import org.healthystyle.util.oauth2.RefreshTokenException;
 import org.healthystyle.util.oauth2.TokenService;
@@ -29,6 +31,9 @@ public class AuthController {
 	@Autowired
 	private TokenService tokenService;
 	private Map<String, String> cachedUris = new HashMap<>();
+	
+	@Autowired
+	private MealRepository mealRepository;
 
 //	@GetMapping("/oauth2/redirect")
 //	@ResponseBody
@@ -122,7 +127,13 @@ public class AuthController {
 		response.addCookie(refreshTokenCookie);
 	}
 
-	public static void main(String[] args) throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {
+	@GetMapping("/time")
+	public LocalDateTime getCurrentTime() {
+		return mealRepository.getCurrentTime();
+	}
+
+	public static void main(String[] args)
+			throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {
 		URL url = new URL("http://treat-service:3001/auth/health");
 		URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(),
 				url.getQuery(), url.getRef());

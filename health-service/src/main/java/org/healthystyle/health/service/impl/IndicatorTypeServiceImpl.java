@@ -29,6 +29,7 @@ import org.healthystyle.health.service.validation.ParamsChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -58,6 +59,7 @@ public class IndicatorTypeServiceImpl implements IndicatorTypeService {
 	private static final Logger LOG = LoggerFactory.getLogger(IndicatorTypeServiceImpl.class);
 
 	@Override
+	@Cacheable
 	public IndicatorType findById(Long id) throws IndicatorTypeNotFoundException {
 		LOG.debug("Fetching an indicator type by id '{}'", id);
 		Optional<IndicatorType> indicatorType = repository.findById(id);
